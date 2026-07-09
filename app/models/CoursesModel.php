@@ -61,7 +61,7 @@ class CoursesModel extends Model{
         ", $params);
     }
 
-    public function findPublishedCourseDetailById(string $id): ?array {
+    public function findPublishedCourseDetail(string $id): ?array {
         return $this->one("
             SELECT
                 c.course_id,
@@ -97,8 +97,8 @@ class CoursesModel extends Model{
         ]);
     }
 
-    public function isPublished(string $id): bool {
-        return $this->exists('courses', ['course_id' => $id, 'status' => 'published']);
+    public function isCoursePublish(string $courseId): bool {
+        return $this->exists('courses', ['course_id' => $courseId]);
     }
 
     public function incrementTotalStudents(string $courseId): bool {
@@ -111,7 +111,7 @@ class CoursesModel extends Model{
         ]);
     }
 
-    public function findCourseSummaryById(string $courseId): ?array {
+    public function findCourseCategoryAndTotalMaterials(string $courseId): ?array {
         return $this->one("
             SELECT
                 c.course_name,
