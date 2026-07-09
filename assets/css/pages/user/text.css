@@ -1,0 +1,133 @@
+.content{
+
+    flex:1;
+
+    margin-left:320px;
+
+    padding:40px;
+}
+
+.text-material{
+
+    max-width:980px;
+
+    margin:0 auto;
+}
+
+.material-header{
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:32px;
+
+    margin-bottom:24px;
+
+    box-shadow:
+        0 10px 30px rgba(15,23,42,.05);
+}
+
+.material-badge{
+
+    display:inline-flex;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    margin-bottom:16px;
+}
+
+.material-title{
+
+    font-size:36px;
+
+    font-weight:800;
+
+    margin-bottom:12px;
+}
+
+.material-description{
+
+    color:#64748b;
+
+    line-height:1.8;
+}
+
+.material-body{
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:40px;
+
+    box-shadow:
+        0 10px 30px rgba(15,23,42,.05);
+}
+
+.material-body.ql-editor p {
+    margin: 0 0 16px;
+}
+
+.material-body.ql-editor h1,
+.material-body.ql-editor h2,
+.material-body.ql-editor h3 {
+    margin: 24px 0 12px;
+}
+
+.material-body.ql-editor ul,
+.material-body.ql-editor ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.material-body.ql-editor li {
+    margin-bottom: 8px;
+}
+
+.material-body.ql-editor blockquote {
+    margin: 16px 0;
+    padding-left: 16px;
+    border-left: 4px solid #ddd;
+}
+
+
+.lesson-actions{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:24px;
+}
+
+@media(max-width:900px){
+
+    .content{
+
+        margin-left:0;
+
+        padding:20px;
+    }
+
+    .material-title{
+
+        font-size:28px;
+    }
+
+    .material-body{
+
+        padding:24px;
+    }
+
+}

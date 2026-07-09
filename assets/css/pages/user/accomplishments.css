@@ -1,0 +1,82 @@
+/* CERTIFICATES */
+
+.section-title{
+
+    font-size:28px;
+
+    margin-bottom:20px;
+}
+
+.certificate-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+    margin-bottom:50px;
+}
+
+.certificate-card{
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    padding:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    box-shadow:var(--shadow);
+}
+
+.certificate-info h3{
+
+    margin-bottom:6px;
+    font-weight: 600;
+}
+
+.certificate-info p{
+
+    color:var(--text-light);
+
+    font-size:12px;
+}
+
+.btn {
+    font-size: 14px;
+}
+
+
+
+/* ACHIEVEMENTS */
+
+.achievement-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(250px,1fr));
+
+    gap:20px;
+}
+
+@media(max-width:768px){
+
+    .certificate-card{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:16px;
+    }
+
+}
