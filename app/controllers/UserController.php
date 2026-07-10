@@ -59,7 +59,12 @@ class UserController extends Controller{
 
         $stats = $this->enrollmentsModel->getUserStats($userId);
         $lastOpenedCourse = $this->enrollmentsModel->findLastOpenedCourse($userId);
-        $userCourses = $this->enrollmentsModel->getAllEnrolledCoursesExceptCourse($userId, $lastOpenedCourse['course_id']);
+
+        $userCourses = null;
+        
+        if ($lastOpenedCourse) {
+            $userCourses = $this->enrollmentsModel->getAllEnrolledCoursesExceptCourse($userId, $lastOpenedCourse['course_id']);
+        }
 
         $this->view('user/mylearning', [
             'stats' => $stats,

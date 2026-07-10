@@ -60,7 +60,7 @@ class LearningController extends Controller {
     */
 
     public function course(array $params) {
-        $this->getCourseOrFail($params['course_id']);
+        $this->isCourseExist($params['course_id']);
 
         $course = $this->coursesModel->findPublishedCourseDetail($params['course_id']);
 
@@ -85,7 +85,7 @@ class LearningController extends Controller {
     public function resume(array $params) {
         $courseId = $params['course_id'];
 
-        $this->getCourseOrFail($courseId);
+        $this->isCourseExist($courseId);
 
         $enrollment = $this->getEnrollmentOrRedirect($courseId);
 
@@ -97,7 +97,7 @@ class LearningController extends Controller {
     public function enroll() {
         $courseId = Request::post('course_id');
 
-        $this->getCourseOrFail($courseId);
+        $this->isCourseExist($courseId);
 
         $userId = Auth::info('id');
 
@@ -336,7 +336,7 @@ class LearningController extends Controller {
     |--------------------------------------------------------------------------
     */
 
-    private function getCourseOrFail(string $courseId) {
+    private function isCourseExist(string $courseId) {
         $course = $this->coursesModel->isCoursePublish($courseId);
 
         $this->abortIf(!$course);

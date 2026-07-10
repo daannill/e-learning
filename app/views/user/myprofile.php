@@ -71,7 +71,7 @@ $scripts = ['user_open'];
                 </div>
 
                 <div class="stat-card">
-                    <h3><?= $stats['completed_materials'] ?></h3>
+                    <h3><?= $stats['completed_materials'] ?? 0 ?></h3>
                     <p>Completed Materials</p>
                 </div>
 
@@ -127,13 +127,13 @@ $scripts = ['user_open'];
                 <div class="progress-row">
 
                     <span>Overall Progress</span>
-                    <span><?= $stats['avg_progress'] ?>%</span>
+                    <span><?= $stats['avg_progress'] ?? 0 ?>%</span>
 
                 </div>
 
                 <div class="progress-bar">
 
-                    <div class="progress-fill" style="width: <?= $stats['avg_progress'] ?>;"></div>
+                    <div class="progress-fill" style="width: <?= $stats['avg_progress'] ?? 0 ?>;"></div>
 
                 </div>
 
@@ -149,27 +149,33 @@ $scripts = ['user_open'];
 
                 <div class="activity-list">
 
-                    <?php foreach ($recentActivity as $item) : ?>
-                        <div class="activity-item">
+                    <?php if ($recentActivity) : ?>
+                        <?php foreach ($recentActivity as $item) : ?>
+                            <div class="activity-item">
 
-                            <div class="activity-info">
+                                <div class="activity-info">
 
-                                <h4>
-                                    <?= $item['course_name'] ?>
-                                </h4>
+                                    <h4>
+                                        <?= $item['course_name'] ?>
+                                    </h4>
 
-                                <p>
-                                    <?= $item['title'] ?>
-                                </p>
+                                    <p>
+                                        <?= $item['title'] ?>
+                                    </p>
+
+                                </div>
+
+                                <span class="activity-status">
+                                    <?= timeAgo($item['opened_at']) ?>
+                                </span>
 
                             </div>
+                        <?php endforeach; ?>    
+                    <?php else : ?>
+                        <h4>No Recent Activity</h4>
+                    <?php endif; ?>
 
-                            <span class="activity-status">
-                                <?= timeAgo($item['opened_at']) ?>
-                            </span>
-
-                        </div>
-                    <?php endforeach; ?>    
+                    
 
                 </div>
 

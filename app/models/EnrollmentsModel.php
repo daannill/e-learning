@@ -139,7 +139,7 @@ class EnrollmentsModel extends Model {
         ]);
     }
 
-    public function findLastOpenedCourse(string $userId): array {
+    public function findLastOpenedCourse(string $userId): ?array {
         return $this->one("
             SELECT
                 c.course_id,

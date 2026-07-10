@@ -49,7 +49,7 @@ $scripts = ['user_open'];
             </div>
 
             <div class="stat">
-                <h3><?= $stats['avg_progress'] ?>%</h3>
+                <h3><?= $stats['avg_progress'] ?? 0 ?>%</h3>
                 <p>Avg Progress</p>
             </div>
 
@@ -137,45 +137,49 @@ $scripts = ['user_open'];
 
             </div>
 
-            <?php foreach ($userCourses as $course) : ?>
+            <?php if ($userCourses) : ?>
 
-                <div class="card-course">
+                <?php foreach ($userCourses as $course) : ?>
 
-                    <div class="thumb"></div>
+                    <div class="card-course">
 
-                    <div class="content">
+                        <div class="thumb"></div>
 
-                        <span class="cat"><?= $course['category_name'] ?></span>
+                        <div class="content">
 
-                        <h3 class="course-title"><?= $course['course_name'] ?></h3>
+                            <span class="cat"><?= $course['category_name'] ?></span>
 
-                        <p class="text"><?= $course['short_description'] ?></p>
+                            <h3 class="course-title"><?= $course['course_name'] ?></h3>
 
-                        <div class="small-progress">
+                            <p class="text"><?= $course['short_description'] ?></p>
 
-                            <div class="small-progress-top">
-                                <span>Progress</span>
-                                <span><?= $course['avg_progress'] ?>%</span>
+                            <div class="small-progress">
+
+                                <div class="small-progress-top">
+                                    <span>Progress</span>
+                                    <span><?= $course['avg_progress'] ?>%</span>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-fill" style="width:<?= $course['avg_progress'] ?>%"></div>
+                                </div>
+
                             </div>
 
-                            <div class="progress">
-                                <div class="progress-fill" style="width:<?= $course['avg_progress'] ?>%"></div>
+                            <div class="card-footer">
+
+                                <span class="teacher"><?= $course['teacher_name'] ?></span>
+                                <a class="link" href="<?= BASEURL . '/course/' . $course['course_id'] ?>"><?= $course['is_completed'] ? 'Review →' : 'Continue →'?></a>
+
                             </div>
-
-                        </div>
-
-                        <div class="card-footer">
-
-                            <span class="teacher"><?= $course['teacher_name'] ?></span>
-                            <a class="link" href="<?= BASEURL . '/course/' . $course['course_id'] ?>"><?= $course['is_completed'] ? 'Review →' : 'Continue →'?></a>
 
                         </div>
 
                     </div>
 
-                </div>
+                <?php endforeach; ?>
 
-            <?php endforeach; ?>
+            <?php endif; ?>
 
         <?php else : ?>
 
