@@ -32,6 +32,14 @@ class Middleware {
         }
     }
 
+    public static function teacher() {
+        self::auth();
+
+        if (Auth::role() !== 'teacher') {
+            Abort::error(403);
+        }
+    }
+
     public static function validateCsrf() {
         $token = Request::post('_token');
 

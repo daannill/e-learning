@@ -112,6 +112,12 @@
                         <a href="<?= BASEURL ?>/myprofile" class="dropdown-item">
                             👤 My Profile
                         </a>
+
+                        <?php if (teacher()) : ?>
+                            <a href="<?= BASEURL ?>/teacher/dashboard" class="dropdown-item">
+                                📚 Dashboard Teacher
+                            </a>
+                        <?php endif; ?>
     
                         <a href="<?= BASEURL ?>/mylearning" class="dropdown-item">
                             📚 My Learning

@@ -4,7 +4,7 @@ namespace Core;
 
 class Controller {
 
-    protected $middleware = [];
+    protected array $middleware = [];
 
     public function runMiddleware(string $method) {
         if (Request::isPost()) {

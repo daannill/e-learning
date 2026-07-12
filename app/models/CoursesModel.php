@@ -41,7 +41,8 @@ class CoursesModel extends Model{
                 c.total_materials,
                 c.total_students,
                 c.average_rating,
-                c.created_at$userColumns
+                c.created_at
+                $userColumns
  
             FROM courses c
  
@@ -129,5 +130,103 @@ class CoursesModel extends Model{
         ", [
             ':course_id' => $courseId
         ]);
+    }
+
+    public function getTeacherStat(string $teacherId): ?array {
+        return $this->one("
+            SELECT
+                COUNT(*) AS total_courses,
+
+                COALESCE(
+                    SUM(total_students),
+                    0
+                ) AS total_enrolled,
+
+                COALESCE(
+                    ROUND(
+                        SUM(average_rating * total_reviews) /
+                        NULLIF(SUM(total_reviews), 0),
+                        1
+                    ),
+                    0
+                ) AS average_rating,
+
+                COALESCE(
+                    SUM(status = 'pending'),
+                    0
+                ) AS pending_courses
+
+            FROM courses
+
+            WHERE instructor_id = :teacher_id
+        ", [
+            ':teacher_id' => $teacherId
+        ]);
+    }
+
+    public function getLatestCoursesTeacher(string $teacherId): array {
+        return $this->many("
+            SELECT
+                c.course_id,
+                cat.category_name,
+                c.course_name,
+                c.thumbnail,
+                c.short_description,
+                c.difficulty,
+                c.total_materials,
+                c.total_students,
+                c.average_rating,
+                c.status,
+                c.created_at
+
+            FROM courses c
+
+            JOIN categories cat
+                ON c.category_id = cat.category_id
+
+            WHERE c.instructor_id = :teacher_id
+
+            ORDER BY c.created_at DESC
+
+            LIMIT 4
+        ", [
+            ':teacher_id' => $teacherId
+        ]);
+    }
+
+    public function getLatestRejectedCourses(string $teacherId): array {
+        return $this->many("
+            SELECT
+                course_id,
+                course_name,
+                updated_at
+
+            FROM courses
+
+            WHERE instructor_id = :teacher_id
+            AND status = 'rejected'
+
+            ORDER BY updated_at DESC
+
+            LIMIT 5
+        ", [
+            ':teacher_id' => $teacherId
+        ]);
+    }
+
+    public function countRejectedCourses(string $teacherId): int {
+        $result = $this->one("
+            SELECT
+                COUNT(*) AS total
+
+            FROM courses
+
+            WHERE instructor_id = :teacher_id
+            AND status = 'rejected'
+        ", [
+            ':teacher_id' => $teacherId
+        ]);
+
+        return (int) $result['total'];
     }
 }

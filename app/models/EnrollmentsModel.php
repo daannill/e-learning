@@ -179,4 +179,101 @@ class EnrollmentsModel extends Model {
             ':user_id' => $userId
         ]);
     }
+    
+    public function getTeacherDashboardActivity(string $teacherId): array {
+        return $this->many("
+            SELECT
+                activity_type,
+                user_name,
+                course_name,
+                rating,
+                created_at
+
+            FROM (
+
+                SELECT
+                    'enroll' AS activity_type,
+                    CONCAT(
+                        ud.first_name,
+                        ' ',
+                        ud.last_name
+                    ) AS user_name,
+                    c.course_name,
+                    NULL AS rating,
+                    e.enrolled_at AS created_at
+
+                FROM enrollments e
+
+                JOIN courses c
+                    ON e.course_id = c.course_id
+
+                JOIN user_details ud
+                    ON e.user_id = ud.user_id
+
+                WHERE c.instructor_id = :teacher_id
+
+
+                UNION ALL
+
+
+                SELECT
+                    'completed' AS activity_type,
+                    CONCAT(
+                        ud.first_name,
+                        ' ',
+                        ud.last_name
+                    ) AS user_name,
+                    c.course_name,
+                    NULL AS rating,
+                    e.last_open AS created_at
+
+                FROM enrollments e
+
+                JOIN courses c
+                    ON e.course_id = c.course_id
+
+                JOIN user_details ud
+                    ON e.user_id = ud.user_id
+
+                WHERE c.instructor_id = :teacher_id
+                AND c.total_materials > 0
+                AND e.total_completed = c.total_materials
+
+
+                UNION ALL
+
+
+                SELECT
+                    'review' AS activity_type,
+                    CONCAT(
+                        ud.first_name,
+                        ' ',
+                        ud.last_name
+                    ) AS user_name,
+                    c.course_name,
+                    r.rating,
+                    r.created_at
+
+                FROM ratings r
+
+                JOIN enrollments e
+                    ON r.enrollment_id = e.enrollment_id
+
+                JOIN courses c
+                    ON e.course_id = c.course_id
+
+                JOIN user_details ud
+                    ON e.user_id = ud.user_id
+
+                WHERE c.instructor_id = :teacher_id
+
+            ) activities
+
+            ORDER BY created_at DESC
+
+            LIMIT 4
+        ", [
+            ':teacher_id' => $teacherId
+        ]);
+    }
 }

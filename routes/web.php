@@ -5,6 +5,7 @@ use Core\Routes;
 use App\Controllers\AuthController;
 use App\Controllers\HomeController;
 use App\Controllers\LearningController;
+use App\Controllers\TeacherController;
 use App\Controllers\UserController;
 
 /*
@@ -57,6 +58,15 @@ Routes::get('/register', [AuthController::class, 'register']);
 Routes::post('/register', [AuthController::class, 'store']);
 
 Routes::get('/logout', [AuthController::class, 'logout']);
+
+/*
+|--------------------------------------------------------------------------
+| Teacher Pages
+|--------------------------------------------------------------------------
+*/
+
+Routes::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
+Routes::get('/teacher/courses', [TeacherController::class, 'courses']);
 
 /*
 |--------------------------------------------------------------------------

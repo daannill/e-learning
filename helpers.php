@@ -31,6 +31,10 @@ function guest() {
     return Auth::guest();
 }
 
+function teacher() {
+    return Auth::role() == 'teacher'; 
+}
+
 function old(string $key) {
     return Old::get($key);
 }

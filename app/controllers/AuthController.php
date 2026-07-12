@@ -19,7 +19,7 @@ class AuthController extends Controller {
     private $loginUsersModel;
     private $userDetailsModel;
 
-    protected $middleware = [
+    protected array $middleware = [
         'guest' => [
             'except' => ['logout'],
         ],

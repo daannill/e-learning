@@ -19,7 +19,7 @@ class UserController extends Controller{
     private $userProgressModel;
     private $savedCoursesModel;
 
-    protected $middleware = [
+    protected array $middleware = [
         'auth' => [
             'only' => ['myLearning', 'accomplishment', 'myProfile', 'saveCourse']
         ],

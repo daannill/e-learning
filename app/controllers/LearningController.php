@@ -36,7 +36,7 @@ class LearningController extends Controller {
     private $userQuizAnswersModel;
     private $materialTextsModel;
 
-    protected $middleware = [
+    protected array $middleware = [
 
     ];
 
