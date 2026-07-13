@@ -229,4 +229,103 @@ class CoursesModel extends Model{
 
         return (int) $result['total'];
     }
+
+    public function getTeacherCourses(
+        string $teacherId,
+        string $status = 'all',
+        string $sort = 'newest',
+        string $search = '',
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+
+        $where = [
+            'c.instructor_id = :teacher_id'
+        ];
+
+        $params = [
+            ':teacher_id' => $teacherId
+        ];
+
+        if ($status !== 'all') {
+            $where[] = 'c.status = :status';
+            $params[':status'] = $status;
+        }
+
+        if ($search !== '') {
+            $where[] = 'c.course_name LIKE :search';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $orderBy = match ($sort) {
+            'oldest' => 'c.created_at ASC',
+            'most_students' => 'c.total_students DESC',
+            'most_reviews' => 'c.total_reviews DESC',
+            'highest_rating' => 'c.average_rating DESC',
+            default => 'c.created_at DESC'
+        };
+
+        return $this->many("
+            SELECT
+                c.course_id,
+                cat.category_name,
+                c.course_name,
+                c.thumbnail,
+                c.short_description,
+                c.difficulty,
+                c.total_materials,
+                c.total_students,
+                c.average_rating,
+                c.total_reviews,
+                c.status,
+                c.created_at
+
+            FROM courses c
+
+            JOIN categories cat
+                ON c.category_id = cat.category_id
+
+            WHERE " . implode(' AND ', $where) . "
+
+            ORDER BY {$orderBy}
+
+            LIMIT {$limit} OFFSET {$offset}
+        ", $params);
+    }
+
+    public function countTeacherCourses(
+        string $teacherId,
+        string $status = 'all',
+        string $search = ''
+    ): int {
+
+        $where = [
+            'c.instructor_id = :teacher_id'
+        ];
+
+        $params = [
+            ':teacher_id' => $teacherId
+        ];
+
+        if ($status !== 'all') {
+            $where[] = 'c.status = :status';
+            $params[':status'] = $status;
+        }
+
+        if ($search !== '') {
+            $where[] = 'c.course_name LIKE :search';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $result = $this->one("
+            SELECT
+                COUNT(*) AS total_courses
+
+            FROM courses c
+
+            WHERE " . implode(' AND ', $where)
+        , $params);
+
+        return (int) $result['total_courses'];
+    }
 }

@@ -12,8 +12,20 @@ class Request {
         return $_POST[$key] ?? $default;
     }
 
+    public static function get(?string $key = null, $default = null) {
+        if ($key === null) {
+            return $_GET;
+        }
+
+        return $_GET[$key] ?? $default;
+    }
+
     public static function hasPost(string $key) {
         return isset($_POST[$key]);
+    }
+
+    public static function hasGet(string $key): bool {
+        return isset($_GET[$key]);
     }
 
     public static function method() {

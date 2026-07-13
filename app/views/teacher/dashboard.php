@@ -6,7 +6,7 @@ $styles = [
     'components/button',
     'components/course_card',
     'components/teacher_sidebar',
-    'pages/teacher/teacher_dashboard',
+    'components/teacher_layout'
 ];
 
 ?>

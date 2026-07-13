@@ -2,7 +2,7 @@
 
 $title = 'Explore Course';
 
-$styles = ['components/navbar', 'components/button', 'components/header_home', 'pages/user/accomplishments'];
+$styles = ['components/navbar', 'components/button', 'components/header', 'pages/user/accomplishments'];
 
 $scripts = ['user_open'];
 

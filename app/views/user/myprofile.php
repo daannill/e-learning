@@ -7,7 +7,7 @@
     
 $title = 'My Learning';
 
-$styles = ['pages/user/myprofile', 'components/navbar', 'components/button', 'components/header_home'];
+$styles = ['pages/user/myprofile', 'components/navbar', 'components/button', 'components/header'];
 
 $scripts = ['user_open'];
 
@@ -172,7 +172,27 @@ $scripts = ['user_open'];
                             </div>
                         <?php endforeach; ?>    
                     <?php else : ?>
-                        <h4>No Recent Activity</h4>
+
+                        <div class="empty-state empty-state--compact">
+
+                            <div class="empty-state-content">
+
+                                <div class="empty-state-icon">
+                                    📈
+                                </div>
+
+                                <h2 class="empty-state-title">
+                                    No Recent Activity
+                                </h2>
+
+                                <p class="empty-state-text">
+                                    Your recent learning activity will appear here as you enroll in courses and complete lessons.
+                                </p>
+
+                            </div>
+
+                        </div>
+
                     <?php endif; ?>
 
                     

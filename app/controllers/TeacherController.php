@@ -8,6 +8,7 @@ use App\Models\CoursesModel;
 use App\Models\EnrollmentsModel;
 use Core\Auth;
 use Core\Controller;
+use Core\Request;
 
 class TeacherController extends Controller {
     
@@ -52,7 +53,48 @@ class TeacherController extends Controller {
     }
 
     public function courses() {
-        $teacherId =  
+        $teacherId = Auth::info('id');
+
+        $status = Request::get('status', 'all');
+        $sort = Request::get('sort', 'newest');
+        $search = trim(Request::get('search', ''));
+        $page = max(1, (int) Request::get('page', 1));
+
+        $limit = 8;
+
+        $courseModel = $this->coursesModel;
+        
+        $totalCourses = $courseModel->countTeacherCourses(
+            $teacherId,
+            $status,
+            $search
+        );
+
+        $totalPages = max(1, (int) ceil($totalCourses / $limit));
+        $page = min($page, $totalPages);
+        $offset = ($page - 1) * $limit;
+
+        $courses = $courseModel->getTeacherCourses(
+            $teacherId,
+            $status,
+            $sort,
+            $search,
+            $limit,
+            $offset
+        );
+
+        $data = [
+            'courses' => $courses,
+            'totalCourses' => $totalCourses,
+            'totalPages' => $totalPages,
+            'page' => $page,
+            'limit' => $limit,
+            'status' => $status,
+            'sort' => $sort,
+            'search' => $search
+        ];
+        
+        $this->view('teacher/courses_teacher', $data);
     }
 
     

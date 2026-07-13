@@ -2,7 +2,7 @@
 
 $title = 'Explore Course';
 
-$styles = ['components/navbar', 'components/course_card', 'components/header_home', 'components/button'];
+$styles = ['components/navbar', 'components/course_card', 'components/header', 'components/button'];
 
 $scripts = ['user_open', 'save_course_button'];
 
@@ -216,23 +216,25 @@ $scripts = ['user_open', 'save_course_button'];
             
         <?php endif; ?>
 
-        <?php if(empty($courses)): ?>
-
-            <!-- EMPTY STATE -->
+        <?php if (empty($courses)) : ?>
 
             <div class="empty-state">
 
-                <div class="empty-icon">
-                    🤍
+                <div class="empty-state-content">
+
+                    <div class="empty-state-icon">
+                        🤍
+                    </div>
+
+                    <h2 class="empty-state-title">
+                        Wishlist is Empty
+                    </h2>
+
+                    <p class="empty-state-text">
+                        You haven't saved any courses yet. Start exploring and save your favorite courses.
+                    </p>
+
                 </div>
-
-                <h2 class="empty-title">
-                    Wishlist is Empty
-                </h2>
-
-                <p class="empty-text">
-                    You haven't saved any courses yet. Start exploring and save your favorite courses.
-                </p>
 
             </div>
 

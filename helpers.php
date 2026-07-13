@@ -168,3 +168,63 @@ function numberShort(int $number): string {
 
     return (string) $number;
 }
+
+function buildQuery(array $params = []): string {
+    $query = $_GET;
+
+    unset($query['url']);
+
+    foreach ($params as $key => $value) {
+
+        if ($value === null || $value === '') {
+            unset($query[$key]);
+            continue;
+        }
+
+        $query[$key] = $value;
+    }
+
+    return empty($query)
+        ? ''
+        : '?' . http_build_query($query);
+}
+
+function paginate(int $page, int $totalPages): array {
+
+    if ($totalPages <= 7) {
+        return range(1, $totalPages);
+    }
+
+    $pages = [1];
+
+    if ($page <= 4) {
+
+        for ($i = 2; $i <= 5; $i++) {
+            $pages[] = $i;
+        }
+
+        $pages[] = '...';
+
+    } elseif ($page >= $totalPages - 3) {
+
+        $pages[] = '...';
+
+        for ($i = $totalPages - 4; $i < $totalPages; $i++) {
+            $pages[] = $i;
+        }
+
+    } else {
+
+        $pages[] = '...';
+
+        for ($i = $page - 1; $i <= $page + 1; $i++) {
+            $pages[] = $i;
+        }
+
+        $pages[] = '...';
+    }
+
+    $pages[] = $totalPages;
+
+    return $pages;
+}

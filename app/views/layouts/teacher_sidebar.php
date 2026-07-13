@@ -39,7 +39,7 @@
 
         <div class="menu-group">
             <span class="menu-label">Overview</span>
-            <a href="#" class="sidebar-item active">
+            <a href="<?= BASEURL . '/teacher/dashboard' ?>" class="sidebar-item <?= active('teacher/dashboard') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
                 <span>Dashboard</span>
             </a>
@@ -47,7 +47,7 @@
 
         <div class="menu-group">
             <span class="menu-label">Courses</span>
-            <a href="#" class="sidebar-item">
+            <a href="<?= BASEURL . '/teacher/courses' ?>" class="sidebar-item <?= active('teacher/courses') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-book"></use></svg>
                 <span>My Courses</span>
             </a>

@@ -2,7 +2,7 @@
     
 $title = 'My Learning';
 
-$styles = ['pages/user/mylearning', 'components/navbar', 'components/button', 'components/header_home'];
+$styles = ['pages/user/mylearning', 'components/navbar', 'components/button', 'components/header'];
 
 $scripts = ['user_open'];
 

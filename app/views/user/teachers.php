@@ -2,7 +2,7 @@
     
 $title = 'Teachers';
 
-$styles = ['pages/user/teachers', 'components/navbar', 'components/button', 'components/header_home'];
+$styles = ['pages/user/teachers', 'components/navbar', 'components/button', 'components/header'];
 
 $scripts = ['user_open'];
 

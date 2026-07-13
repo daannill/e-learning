@@ -11,7 +11,7 @@
 
 .course-grid{
     grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-    padding-bottom:80px;
+    padding-bottom:20px;
     justify-content:start;
 }
 
@@ -363,6 +363,40 @@
     width:100%;
     height:34px;
     max-width:none;
+}
+
+.course-search{
+    position:relative;
+    max-width:360px;
+    margin-bottom:16px;
+}
+ 
+.course-search .icon{
+    position:absolute;
+    left:15px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--text-light);
+}
+ 
+.course-search input{
+    width:100%;
+    height:46px;
+    padding:0 16px 0 44px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    font-size:14px;
+    background:white;
+    box-shadow:var(--shadow-sm);
+    transition:var(--transition);
+}
+ 
+.course-search input:focus{
+    border-color:var(--primary);
+}
+ 
+.course-search input::placeholder{
+    color:#94a3b8;
 }
 
 
