@@ -13,8 +13,6 @@ $styles = [
 
 $scripts = ['filter'];
 
-var_dump($totalCourses);
-
 ?>
 
 <?php require 'app/views/layouts/header.php' ?>
@@ -31,7 +29,7 @@ var_dump($totalCourses);
                 <h1>My Courses</h1>
                 <p>Manage and track all the courses you've created.</p>
             </div>
-            <a href="#" class="btn btn-primary">
+            <a href="<?= BASEURL . '/create/course' ?>" class="btn btn-primary">
                 <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
                 Add Course
             </a>
@@ -160,6 +158,14 @@ var_dump($totalCourses);
                         <div class="course-card course-card--fill">
 
                             <div class="course-thumbnail">
+
+                                <?php if (!empty($course['thumbnail'])): ?>
+                                    <img 
+                                        src="<?= BASEURL . '/uploads/course-thumbnails/' . $course['thumbnail'] ?>" 
+                                        alt="<?= $course['course_name'] ?>" 
+                                        class="course-thumbnail__img"
+                                    >
+                                <?php endif; ?>
 
                                 <span class="course-category">
                                     <?= $course['category_name'] ?>

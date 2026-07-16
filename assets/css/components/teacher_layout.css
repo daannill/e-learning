@@ -294,3 +294,29 @@
     color:var(--text-light);
     white-space:nowrap;
 }
+
+.dashboard-container--form{
+    max-width:860px;
+}
+ 
+/* EXTEND: spacing buat back-link kalau ditaruh sendiri di atas
+   topbar (di luar flex row-nya), bukan di samping greeting */
+.page-back-link{
+    margin-bottom:16px;
+}
+
+.attention-icon--video{background:rgba(37,99,235,.1);color:var(--primary);}
+.attention-icon--text{background:rgba(100,116,139,.12);color:var(--text-light);}
+.attention-icon--quiz{background:rgba(245,158,11,.12);color:var(--warning);}
+.attention-icon--assignment{background:rgba(22,163,74,.1);color:var(--success);}
+
+/* EXTEND: varian list dengan garis pemisah antar row, khusus dipakai lewat
+   class tambahan supaya widget "Needs Your Attention" di dashboard gak kena efek */
+.attention-list--divided .attention-item{
+    padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+}
+.attention-list--divided .attention-item:last-child{
+    padding-bottom:0;
+    border-bottom:none;
+}

@@ -4,11 +4,9 @@ namespace Core;
 
 class Validator {
 
-    private static array $errors;
+    private static array $errors = [];
 
     public static function validate(array $data, array $rules, ?array $attributes = null) {
-        self::$errors = [];
-
         foreach ($rules as $field => $ruleString) {
             $fieldName = $attributes[$field] ?? ucfirst($field);
 
@@ -19,14 +17,14 @@ class Validator {
 
                 if ($rule === 'required') {
                     if ($value === '') {
-                        self::$errors[$field] = "$fieldName wajib diisi";
+                        self::setError($field, "$fieldName wajib diisi");
                         break;
                     }
                 }
 
                 if ($rule === 'email') {
                     if ($value !== '' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                        self::$errors[$field] = 'Format email tidak valid';
+                        self::setError($field, 'Format email tidak valid');
                         break;
                     }
                 }
@@ -35,7 +33,68 @@ class Validator {
                     $min = explode(':', $rule)[1];
 
                     if (strlen($value) < $min) {
-                        self::$errors[$field] = "$fieldName minimal $min karakter";
+                        self::setError($field, "$fieldName minimal $min karakter");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static function validateFile(
+        array $files,
+        array $rules,
+        ?array $attributes = null
+    ) {
+        foreach ($rules as $field => $ruleString) {
+            $fieldName = $attributes[$field] ?? ucfirst($field);
+            $ruleList = explode('|', $ruleString);
+            $file = $files[$field] ?? null;
+
+            foreach ($ruleList as $rule) {
+                if ($rule === 'required') {
+                    if (!$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
+                        self::setError($field, "$fieldName wajib diisi");
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+                    continue;
+                }
+
+                if ($rule === 'image') {
+                    if (!str_starts_with($file['type'], 'image/')) {
+                        self::setError($field, "$fieldName harus berupa gambar");
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (str_starts_with($rule, 'mimes:')) {
+                    $allowed = explode(':', $rule, 2)[1];
+                    $allowed = explode(',', $allowed);
+
+                    $extension = strtolower(
+                        pathinfo($file['name'], PATHINFO_EXTENSION)
+                    );
+
+                    if (!in_array($extension, $allowed, true)) {
+                        self::setError($field, "$fieldName memiliki format yang tidak didukung");
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (str_starts_with($rule, 'max:')) {
+                    $max = (int) explode(':', $rule, 2)[1];
+
+                    if ($file['size'] > ($max * 1024 * 1024)) {
+                        self::setError($field, "$fieldName maksimal {$max}MB");
                         break;
                     }
                 }
@@ -50,15 +109,13 @@ class Validator {
 
         if (is_array($fields)) {
             foreach ($fields as $field => $msg) {
-                if (!isset(self::$errors[$field])) {
-                    self::$errors[$field] = $msg;
-                }
+                self::setError($field, $msg);
             }
 
             return;
         }
 
-        self::$errors[$fields] = $message;
+        self::setError($fields, $message);
     }
 
     public static function fails() {
@@ -67,5 +124,23 @@ class Validator {
 
     public static function errors() {
         return self::$errors;
+    }
+
+    private static function setError(string $key, string $message) {
+        $keys = explode('.', $key);
+        $temp = &self::$errors;
+
+        foreach ($keys as $index => $segment) {
+            if ($index === count($keys) - 1) {
+                $temp[$segment] = $message;
+                return;
+            }
+
+            if (!isset($temp[$segment]) || !is_array($temp[$segment])) {
+                $temp[$segment] = [];
+            }
+
+            $temp = &$temp[$segment];
+        }
     }
 }

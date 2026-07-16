@@ -62,15 +62,25 @@ class Model {
         return !empty($this->findByOne($table, ['1'], $conditions, $operator));
     }
 
-    protected function pluckColumn(string $table, array $columns, array $conditions, string $operator = 'AND'): array {
-        [$where, $params] = $this->buildWhere($conditions, $operator);
+    protected function findMany(string $table, array $columns = ['*'],  array $conditions = [], string $operator = 'AND'): array {
         $columnList = implode(', ', $columns);
- 
-        return $this->many("
+
+        $sql = "
             SELECT $columnList
             FROM $table
-            WHERE $where
-        ", $params);
+        ";
+
+        $params = [];
+
+        if (!empty($conditions)) {
+            [$where, $params] = $this->buildWhere($conditions, $operator);
+
+            $sql .= "
+                WHERE $where
+            ";
+        }
+
+        return $this->many($sql, $params);
     }
 
     protected function insert(string $table, array $data) {
@@ -111,5 +121,9 @@ class Model {
         }
 
         return $this->run("DELETE FROM `$table` WHERE $where", $params);
+    }
+
+    protected function lastInsertId() {
+        return $this->db->lastInsertId();
     }
 }

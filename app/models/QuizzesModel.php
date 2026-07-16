@@ -14,6 +14,30 @@ class QuizzesModel extends Model {
         );
     }
 
+    public function findQuizByMaterialId(string $materialId): ?array {
+        return $this->findByOne(
+            'quizzes',
+            ['quiz_id', 'material_id', 'minimum_correct', 'total_questions', 'max_attempts', 'reset_minutes', 'timer'],
+            ['material_id' => $materialId]
+        );
+    }
+
+    public function create(array $data): int|false {
+        $insert = $this->insert('quizzes', [
+            'material_id' => $data['material_id'],
+            'minimum_correct' => $data['minimum_correct'],
+            'total_questions' => $data['total_questions'],
+            'max_attempts' => $data['max_attempts'],
+            'reset_minutes' => $data['reset_minutes'],
+            'timer' => $data['timer']
+        ]);
+
+        if (!$insert) {
+            return $insert;
+        }
+
+        return $this->lastInsertId();
+    }
 
     public function getQuizUser(string $materialId, string $enrollmentId): ?array {
         return $this->one("

@@ -26,7 +26,7 @@ $styles = [
                 <h1>Hi, <?= authInfo('name') ?> 👋</h1>
                 <p>Here's what's happening with your courses today.</p>
             </div>
-            <a href="<?= BASEURL . '/teacher/course/create' ?>" class="btn btn-primary">
+            <a href="<?= BASEURL . '/course/create' ?>" class="btn btn-primary">
                 <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
                 Add Course
             </a>
@@ -39,7 +39,7 @@ $styles = [
                 </span>
                 <div>
                     <h3><?= $teacherStats['total_courses'] ?></h3>
-                    <p>Total Courses</p>
+                    <p>Total Publish Courses</p>
                 </div>
             </div>
 
@@ -87,8 +87,15 @@ $styles = [
                     <?php foreach ($recentCourse as $course) : ?>
                         <div class="course-card course-card--fill">
                             <div class="course-thumbnail">
+                                <?php if (!empty($course['thumbnail'])): ?>
+                                    <img 
+                                        src="<?= BASEURL . '/uploads/course-thumbnails/' . $course['thumbnail'] ?>" 
+                                        alt="<?= $course['course_name'] ?>" 
+                                        class="course-thumbnail__img"
+                                    >
+                                <?php endif; ?>
                                 <span class="course-category"><?= $course['category_name'] ?></span>
-                                <span class="course-status-badge status-published"><?= $course['status'] ?></span>
+                                <span class="course-status-badge status-<?= $course['status'] ?>"><?= ucfirst($course['status']) ?></span>
                             </div>
 
                             <div class="course-content">

@@ -12,6 +12,14 @@ class Str {
         return 'USR' . self::random(6);
     }
 
+    public static function courseId() {
+        return 'CRS' . self::random(6);
+    }
+
+    public static function materialId() {
+        return 'MAT' . self::random(6);
+    }
+
     public static function enrollmentId() {
         return 'ENR' . self::random(6);
     }

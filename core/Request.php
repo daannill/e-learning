@@ -20,6 +20,22 @@ class Request {
         return $_GET[$key] ?? $default;
     }
 
+    public static function file(?string $key = null, $default = null) {
+        if ($key === null) {
+            return $_FILES;
+        }
+
+        return $_FILES[$key] ?? $default;
+    }
+
+    public static function hasFile(string $key): bool {
+        if (!isset($_FILES[$key])) {
+            return false;
+        }
+
+        return $_FILES[$key]['error'] !== UPLOAD_ERR_NO_FILE;
+    }
+
     public static function hasPost(string $key) {
         return isset($_POST[$key]);
     }

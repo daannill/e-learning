@@ -49,6 +49,17 @@
     background:var(--success-light);
 }
 
+.btn-danger {
+    background:var(--danger-bg);
+    color: var(--danger);
+}
+
+.btn-danger:hover {
+    background: rgb(250, 207, 207);
+    color: var(--danger);
+}
+
+
 .btn-outline{
     background:white;
     border:1px solid var(--border);
@@ -61,6 +72,17 @@
 }
 
 .btn-primary .icon{
+    margin-right:8px;
+    width:16px;
+    height:16px;
+}
+
+.btn-sm{
+    padding:8px 14px;
+    font-size:13px;
+}
+
+.btn .icon{
     margin-right:8px;
     width:16px;
     height:16px;

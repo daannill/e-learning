@@ -96,4 +96,28 @@ class MaterialsModel extends Model {
             ':material_id' => $materialId
         ]);
     }
+
+    public function findLastOrderIndex(string $courseId): int {
+        $material = $this->one("
+            SELECT order_index
+            FROM materials
+            WHERE course_id = :course_id
+            ORDER BY order_index DESC
+            LIMIT 1
+        ", [
+            ':course_id' => $courseId
+        ]);
+
+        return (int) ($material['order_index'] ?? 0);
+    }
+
+    public function create(array $data): bool {
+        return $this->insert('materials', [
+            'material_id' => $data['material_id'],
+            'course_id' => $data['course_id'],
+            'title' => $data['title'],
+            'type' => $data['type'],
+            'order_index' => $data['order_index']
+        ]);
+    }
 }

@@ -67,7 +67,13 @@ Routes::get('/logout', [AuthController::class, 'logout']);
 
 Routes::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
 Routes::get('/teacher/courses', [TeacherController::class, 'courses']);
-Routes::get('/teacher/create/course', [TeacherController::class, 'createCourse']);
+Routes::get('/teacher/course/{course_id}', [TeacherController::class, 'course']);
+
+Routes::get('/create/course', [TeacherController::class, 'createCourse']);
+Routes::post('/create/course', [TeacherController::class, 'storeCourse']);
+
+Routes::get('/create/video/{course_id}', [TeacherController::class, 'createVideo']);
+Routes::post('/create/video/{course_id}', [TeacherController::class, 'storeVideo']);
 
 /*
 |--------------------------------------------------------------------------

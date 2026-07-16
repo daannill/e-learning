@@ -13,4 +13,12 @@ class MaterialVideosModel extends Model {
             ['material_id' => $materialId]
         );
     }
+
+    public function create(array $data): bool {
+        return $this->insert('material_videos', [
+            'material_id' => $data['material_id'],
+            'source_type' => $data['source_type'],
+            'video_url' => $data['video_url']
+        ]);
+    }
 }

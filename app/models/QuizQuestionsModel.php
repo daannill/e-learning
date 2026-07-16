@@ -53,4 +53,18 @@ class QuizQuestionsModel extends Model {
  
         return array_values($questions);
     }
+
+    public function create(array $data): int|false {
+        $insert = $this->insert('quiz_questions', [
+            'quiz_id' => $data['quiz_id'],
+            'question_order' => $data['question_order'],
+            'question' => $data['question']
+        ]);
+
+        if (!$insert) {
+            return $insert;
+        }
+
+        return $this->lastInsertId();
+    }
 }

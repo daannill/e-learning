@@ -228,3 +228,18 @@ function paginate(int $page, int $totalPages): array {
 
     return $pages;
 }
+
+function materialIcon(string $type): string {
+    switch ($type) {
+        case 'video':
+            return 'i-play';
+        case 'text':
+            return 'i-file-text';
+        case 'quiz':
+            return 'i-help-circle';
+        case 'assignment':
+            return 'i-clipboard';
+        default:
+            return 'i-file-text';
+    }
+}

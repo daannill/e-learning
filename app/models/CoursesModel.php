@@ -62,6 +62,25 @@ class CoursesModel extends Model{
         ", $params);
     }
 
+    public function create(array $data): bool {
+        return $this->insert('courses', [
+            'course_id' => $data['course_id'],
+            'instructor_id' => $data['instructor_id'],
+            'course_name' => $data['course_name'],
+            'category_id' => $data['category_id'],
+            'short_description' => $data['short_description'],
+            'description' => $data['description'],
+            'thumbnail' => $data['thumbnail'],
+            'difficulty' => $data['difficulty'],
+            'status' => $data['status'],
+            'total_materials' => $data['total_materials'],
+            'total_students' => $data['total_students'],
+            'total_duration' => $data['total_duration'],
+            'average_rating' => $data['average_rating'],
+            'total_reviews' => $data['total_reviews']
+        ]);
+    }
+
     public function findPublishedCourseDetail(string $id): ?array {
         return $this->one("
             SELECT
@@ -99,7 +118,7 @@ class CoursesModel extends Model{
     }
 
     public function isCoursePublish(string $courseId): bool {
-        return $this->exists('courses', ['course_id' => $courseId]);
+        return $this->exists('courses', ['course_id' => $courseId, 'status' => 'published']);
     }
 
     public function incrementTotalStudents(string $courseId): bool {
@@ -159,6 +178,7 @@ class CoursesModel extends Model{
             FROM courses
 
             WHERE instructor_id = :teacher_id
+                AND status = 'published';
         ", [
             ':teacher_id' => $teacherId
         ]);
@@ -185,6 +205,7 @@ class CoursesModel extends Model{
                 ON c.category_id = cat.category_id
 
             WHERE c.instructor_id = :teacher_id
+                AND c.status <> 'archived'
 
             ORDER BY c.created_at DESC
 
@@ -327,5 +348,56 @@ class CoursesModel extends Model{
         , $params);
 
         return (int) $result['total_courses'];
+    }
+
+    public function findCourse(string $courseId): ?array {
+        return $this->one("
+            SELECT
+                c.course_id,
+                c.course_name,
+                c.instructor_id,
+                c.description,
+                c.total_materials,
+                c.total_students,
+                c.average_rating,
+                c.created_at,
+                cat.category_name,
+                c.difficulty,
+                c.thumbnail,
+                c.status,
+                CONCAT(
+                    ud.first_name,
+                    ' ',
+                    ud.last_name
+                ) AS teacher_name,
+                tp.job_title
+
+            FROM courses c
+
+            JOIN categories cat
+                ON c.category_id = cat.category_id
+
+            JOIN user_details ud
+                ON c.instructor_id = ud.user_id
+
+            JOIN teacher_profiles tp
+                ON c.instructor_id = tp.user_id
+
+            WHERE c.course_id = :course_id
+
+            LIMIT 1
+        ",[
+            'course_id' => $courseId
+        ]);
+    }
+
+    public function teacherOwnsCourse(string $courseId, string $teacherId): bool {
+        return $this->exists(
+            'courses',
+            [
+                'course_id' => $courseId,
+                'instructor_id' => $teacherId
+            ]
+        );
     }
 }
