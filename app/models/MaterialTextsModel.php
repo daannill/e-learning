@@ -13,4 +13,11 @@ class MaterialTextsModel extends Model {
             ['material_id' => $materialId]
         );
     }
+
+    public function create(array $data): bool {
+        return $this->insert('material_texts', [
+            'material_id' => $data['material_id'],
+            'content' => $data['content']
+        ]);
+    }
 }

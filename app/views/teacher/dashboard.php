@@ -26,7 +26,7 @@ $styles = [
                 <h1>Hi, <?= authInfo('name') ?> 👋</h1>
                 <p>Here's what's happening with your courses today.</p>
             </div>
-            <a href="<?= BASEURL . '/course/create' ?>" class="btn btn-primary">
+            <a href="<?= BASEURL . '/create/course' ?>" class="btn btn-primary">
                 <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
                 Add Course
             </a>
@@ -117,7 +117,7 @@ $styles = [
                                 </div>
 
                                 <div class="course-footer">
-                                    <a href="<?= BASEURL . '/course/' . $course['course_id'] ?>" class="btn-course btn-course--full btn-outline">
+                                    <a href="<?= BASEURL . '/teacher/course/' . $course['course_id'] ?>" class="btn-course btn-course--full btn-outline">
                                         Manage
                                     </a>
                                 </div>

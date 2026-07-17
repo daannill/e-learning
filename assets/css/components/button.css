@@ -29,7 +29,7 @@
 
 .btn-secondary{
 
-    background:white;
+    background:rgb(247, 242, 242);
 
     color:#0f172a;
 
@@ -37,7 +37,7 @@
 }
 
 .btn-secondary:hover {
-    background-color: #f3f3f3;
+    background-color: #d8d3d3;
 }
 
 .btn-green{

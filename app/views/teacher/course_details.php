@@ -81,7 +81,7 @@ $scripts = ['open_modal'];
                                 <svg class="icon" aria-hidden="true">
                                     <use href="#i-edit"></use>
                                 </svg>
-                                Edit
+                                Edit Course
                             </a>
 
                             <form
@@ -92,13 +92,14 @@ $scripts = ['open_modal'];
                                     <svg class="icon" aria-hidden="true">
                                         <use href="#i-archive"></use>
                                     </svg>
-                                    Archive
+                                    Archive Course
                                 </button>
                             </form>
 
                             <form
                                 method="POST"
                                 action="<?= BASEURL . '/teacher/course/publish/' . $course['course_id'] ?>"
+                                style="margin-left: auto;"
                             >
                                 <button type="submit" class="btn btn-green btn-sm">
                                     <svg class="icon" aria-hidden="true">
@@ -175,7 +176,7 @@ $scripts = ['open_modal'];
                                             <?= $index + 1 ?>. <?= $material['title'] ?>
                                         </p>
                                         <p class="attention-item-meta">
-                                            <?= $material['type'] ?>
+                                            <?= ucfirst($material['type']) ?>
                                         </p>
                                     </div>
  
@@ -184,8 +185,15 @@ $scripts = ['open_modal'];
                                 <div class="flex items-center gap-1">
  
                                     <a
-                                        href="<?= BASEURL . '/teacher/material/edit/' . $material['material_id'] ?>"
+                                        href="<?= BASEURL . '/view/' . $material['type'] . '/' . $material['material_id'] ?>"
                                         class="btn-course btn-outline"
+                                    >
+                                        View
+                                    </a>
+
+                                    <a
+                                        href="<?= BASEURL . '/edit/' . $material['type'] . '/' . $material['material_id'] ?>"
+                                        class="btn-course btn-primary"
                                     >
                                         Edit
                                     </a>
@@ -255,15 +263,15 @@ $scripts = ['open_modal'];
                 <span class="material-type-icon"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
                 <span>Video</span>
             </a>
-            <a href="#" class="material-type-option material-type-option--text">
+            <a href="<?= BASEURL . '/create/text/' . $course['course_id'] ?>" class="material-type-option material-type-option--text">
                 <span class="material-type-icon"><svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg></span>
                 <span>Text</span>
             </a>
-            <a href="#" class="material-type-option material-type-option--quiz">
+            <a href="<?= BASEURL . '/create/quiz/' . $course['course_id'] ?>" class="material-type-option material-type-option--quiz">
                 <span class="material-type-icon"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg></span>
                 <span>Quiz</span>
             </a>
-            <a href="#" class="material-type-option material-type-option--assignment">
+            <a href="<?= BASEURL . '/create/assignment/' . $course['course_id'] ?>" class="material-type-option material-type-option--assignment">
                 <span class="material-type-icon"><svg class="icon" aria-hidden="true"><use href="#i-check-square"></use></svg></span>
                 <span>Assignment</span>
             </a>

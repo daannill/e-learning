@@ -1,0 +1,225 @@
+    /* =========================================================
+    EDITOR.CSS — BARU
+    Skin buat Quill rich text editor (dipakai di form Add Text
+    Material, dan kemungkinan bakal dipakai lagi di form
+    Assignment/Quiz nanti buat instruksi/penjelasan soal).
+
+    Belum ada component editor sama sekali di project ini
+    sebelumnya, jadi ini file baru — bukan extend dari file lain.
+
+    Dependency: Quill 1.3.6 (quill.snow.css) dimuat dari CDN,
+    file ini cuma nge-override tampilannya biar nyambung sama
+    .form-control (border, radius, warna, focus & error state).
+    ========================================================= */
+
+    .editor-wrapper{
+        border-radius:var(--radius-sm);
+        transition:var(--transition);
+    }
+
+    .editor-wrapper .ql-toolbar.ql-snow{
+        border-color:var(--border);
+        border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+        background:var(--bg);
+        font-family:var(--font-main);
+    }
+
+    .editor-wrapper .ql-container.ql-snow{
+        border-color:var(--border);
+        border-radius:0 0 var(--radius-sm) var(--radius-sm);
+        font-family:var(--font-main);
+        font-size:15px;
+    }
+
+    .editor-wrapper .ql-editor{
+        min-height:220px;
+        padding:16px;
+        line-height:1.7;
+        color:#000;
+    }
+
+    .editor-wrapper .ql-editor.ql-blank::before{
+        color:#94a3b8;
+        font-size:14px;
+        font-style:normal;
+    }
+
+    .editor-wrapper .ql-editor,
+    .editor-wrapper .ql-editor *{
+        color:#000 !important;
+    }
+
+    .editor-wrapper.is-focused .ql-toolbar.ql-snow,
+    .editor-wrapper.is-focused .ql-container.ql-snow{
+        border-color:var(--primary);
+    }
+
+    .editor-wrapper.is-focused{
+        box-shadow:0 0 0 4px rgba(37,99,235,.1);
+    }
+
+    .editor-wrapper.error .ql-toolbar.ql-snow,
+    .editor-wrapper.error .ql-container.ql-snow{
+        border-color:var(--danger);
+    }
+
+    .ql-snow .ql-picker.ql-size{
+        width:90px;
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-label::before{
+        content:"Normal";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="small"]::before{
+        content:"Small";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="large"]::before{
+        content:"Large";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="huge"]::before{
+        content:"Huge";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-item::before{
+        content:"Normal";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before{
+        content:"Small";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before{
+        content:"Large";
+    }
+
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before{
+        content:"Huge";
+    }
+
+    /* Toolbar text */
+    .ql-snow .ql-picker{
+        color:#000;
+    }
+
+    .ql-snow .ql-picker-label{
+        color:#000;
+    }
+
+    .ql-snow .ql-picker-options{
+        color:#000;
+    }
+
+    .ql-snow .ql-stroke{
+        stroke:#000;
+    }
+
+    .ql-snow .ql-fill{
+        fill:#000;
+    }
+
+    /* =========================================================
+    NEW: .material-content — buat nampilin HASIL konten Quill
+    di halaman VIEW (murid), bukan pas lagi diedit.
+
+    Sengaja dipisah dari .ql-editor: di halaman view gak perlu
+    load Quill.js / quill.snow.css sama sekali, HTML yang
+    tersimpan di-echo langsung terus di-styling pakai class ini aja.
+    Lebih ringan buat murid daripada ikut load whole editor library.
+    ========================================================= */
+    .material-content{
+        font-size:15px;
+        line-height:1.8;
+        color:#000;
+    }
+
+    .material-content,
+.material-content p,
+.material-content span,
+.material-content li,
+.material-content strong,
+.material-content em{
+    color:#000;
+}
+
+    .material-content p{
+        margin-bottom:14px;
+    }
+
+    .material-content p:last-child{
+        margin-bottom:0;
+    }
+
+    .material-content strong{
+        font-weight:700;
+    }
+
+    .material-content em{
+        font-style:italic;
+    }
+
+    .material-content u{
+        text-decoration:underline;
+    }
+
+    .material-content ul,
+    .material-content ol{
+        margin:0 0 14px 22px;
+    }
+
+    .material-content li{
+        margin-bottom:6px;
+    }
+
+    .material-content a{
+        color:var(--primary);
+        text-decoration:underline;
+    }
+
+    .material-content a:hover{
+        color:var(--primary-hover);
+    }
+
+    .material-content .ql-size-small{
+    font-size:0.75em;
+}
+
+.material-content .ql-size-large{
+    font-size:1.5em;
+}
+
+.material-content .ql-size-huge{
+    font-size:2.5em;
+}
+
+.material-content h1{
+    font-size:2rem;
+    font-weight:700;
+    margin-bottom:16px;
+}
+
+.material-content h2{
+    font-size:1.5rem;
+    font-weight:700;
+    margin-bottom:14px;
+}
+
+.material-content blockquote{
+    border-left:4px solid #ddd;
+    padding-left:16px;
+    margin:16px 0;
+    color:#555;
+}
+
+.material-content pre{
+    background:#f8f8f8;
+    padding:16px;
+    border-radius:8px;
+    overflow:auto;
+}
+
+.material-content code{
+    font-family:monospace;
+}

@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\AssignmentAttemptsModel;
+use App\Models\AssignmentsModel;
 use App\Models\CategoriesModel;
 use App\Models\CoursesModel;
 use App\Models\EnrollmentsModel;
 use App\Models\MaterialsModel;
+use App\Models\MaterialTextsModel;
 use App\Models\MaterialVideosModel;
 use App\Models\QuizOptionsModel;
 use App\Models\QuizQuestionsModel;
@@ -32,6 +34,8 @@ class TeacherController extends Controller {
     private $quizzesModel;
     private $quizQuestionsModel;
     private $quizOptionsModel;
+    private $materialTextsModel;
+    private $assignmentsModel;
 
     protected array $middleware = [];
 
@@ -45,6 +49,8 @@ class TeacherController extends Controller {
         $this->quizzesModel = new QuizzesModel();
         $this->quizQuestionsModel = new QuizQuestionsModel();
         $this->quizOptionsModel = new QuizOptionsModel();
+        $this->materialTextsModel = new MaterialTextsModel();
+        $this->assignmentsModel = new AssignmentsModel();
     }
 
     public function dashboard() {
@@ -261,33 +267,53 @@ class TeacherController extends Controller {
         $this->view('teacher/materials/material_video', $data);
     }
 
+    public function viewVideo(array $params) {
+        $materialId = $params['material_id'];
+
+        $material = $this->materialsModel->findMaterial($materialId);
+        $course = $this->coursesModel->findCourse($material['course_id']);
+        $materialVideo = $this->materialVideosModel->findMaterialVideo($materialId);
+
+        $quiz = $this->getQuiz($materialId);
+
+        $materialFull = [
+            'title'           => $material['title'],
+            'video_source'    => $materialVideo['source_type'],
+            'video_url'       => $materialVideo['source_type'] == 'youtube' ? $materialVideo['video_url'] : null,
+            'video_path'      => $materialVideo['source_type'] == 'video' ? $materialVideo['video_url'] : null,
+            'video_filename'  => $materialVideo['source_type'] == 'video' ? $materialVideo['video_url'] : null,
+            'material_id' => $materialId
+        ];
+
+        $data = [
+            'course' => [
+                'course_id' => $course['course_id'],
+                'title' => $course['course_name'],
+                'status' => $course['status']
+            ],
+            'material' => $materialFull,
+            'settings' => $quiz['settings'],
+            'questions' => $quiz['questions']
+        ];
+
+        $this->view('generic/video_view', $data);
+    }
+
     public function editVideo(array $params) {
         $materialId = $params['material_id'];
 
         $material = $this->materialsModel->findMaterial($materialId);
-
         $course = $this->coursesModel->findCourse($material['course_id']);
-
         $materialVideo = $this->materialVideosModel->findMaterialVideo($materialId);
 
-        $quiz = $this->quizzesModel->findQuiz($materialId);
-
-        $this->quizQuestionsModel->getAllQuestionsWithOptions($quiz['quiz_id']);
+        $quiz = $this->getQuiz($materialId);
 
         $materialFull = [
             'title'           => $material['title'],
-            'video_source'    => $,
-            'video_url'       => $materialVideo['video_source'] == 'youtube' ? $materialVideo['video_url'] : null,
-            'video_path'      => $materialVideo['video_source'] == 'video' ? $materialVideo['video_url'] : null,
-            'video_filename'  => $materialVideo['video_source'] == 'youtube' ? $materialVideo['video_url'] : null,
-        ];
-
-        $settings = [
-            'minimum_correct'  => $quiz['minimum_correct'],
-            'total_questions'  => 5,
-            'max_attempts'     => 3,
-            'reset_minutes'    => 30,
-            'timer'            => 15,
+            'video_source'    => $materialVideo['source_type'],
+            'video_url'       => $materialVideo['source_type'] == 'youtube' ? $materialVideo['video_url'] : null,
+            'video_path'      => $materialVideo['source_type'] == 'video' ? $materialVideo['video_url'] : null,
+            'video_filename'  => $materialVideo['source_type'] == 'video' ? $materialVideo['video_url'] : null
         ];
 
         $data = [
@@ -298,43 +324,19 @@ class TeacherController extends Controller {
                 'title' => $course['course_name']
             ],
             'material' => $materialFull,
-            'settings' => $settings,
-            'oldQuestions' => $oldQustions
+            'settings' => $quiz['settings'],
+            'oldQuestions' => $quiz['questions']
         ];
+
+        $this->view('teacher/materials/material_video', $data);
     }
 
     public function storeVideo(array $params) {
         $courseId = $params['course_id'];
         $data = Request::post();
-        $file = Request::file();
+        $files = Request::file();
 
-        Validator::validate(
-            $data,
-            [
-                'title' => 'required|max:120'
-            ],
-            [
-                'title' => 'Material title'
-            ]
-        );
-
-        if ($data['video_source'] === 'youtube') {
-            Validator::check(
-                empty($data['video_url']),
-                'video_url',
-                'Video URL wajib diisi.'
-            );
-        } else {
-            Validator::validateFile(
-                $file,
-                [
-                    'video_file' => 'required|mimes:mp4,webm|max:200'
-                ],
-                [
-                    'video_file' => 'Video'
-                ]
-            );
-        }
+        $this->validateVideo($data, $files);
 
         $this->validateQuiz(
             $data['quiz'] ?? [],
@@ -354,25 +356,9 @@ class TeacherController extends Controller {
 
         $materialId = Str::materialId();
 
-        $videoFile = '';
-        
-        if (Request::hasFile('video_file')) {
-            $videoFile = File::upload(
-                Request::file('video_file'),
-                UPLOAD_PATH . '/material-videos',
-                $materialId
-            );
+        $videoFile = $this->uploadVideo($materialId);
 
-            $this->failIf(
-                !$videoFile,
-                "/create/video/$courseId",
-                [
-                    'error' => 'Upload video gagal'
-                ]
-            );
-        }
-
-        $videoPath = $data['video_url'] ?? $videoFile;
+        $videoPath = $data['video_url'] ?: $videoFile;
 
         $orderIndex = $this->materialsModel->findLastOrderIndex($courseId) + 1;
 
@@ -391,11 +377,11 @@ class TeacherController extends Controller {
                 'video_url' => $videoPath
             ]);
 
-            $this->createQuiz($materialId, $data);
+            $this->saveQuiz($materialId, $data);
         });
 
         if (!$transaction && $data['video_source'] === 'video') {
-            File::delete(UPLOAD_PATH . '/material-videos/' . $videoPath);
+            $this->rollbackUploadedVideo($videoPath);
 
             $this->failIf(
                 true,
@@ -412,6 +398,512 @@ class TeacherController extends Controller {
         );
 
         Redirect::to("/teacher/course/$courseId");
+    }
+
+    public function createText(array $params) {
+        $courseId = $params['course_id'];
+
+        $course = $this->coursesModel->findCourse($courseId);
+
+        $data = [
+            'isEdit' => false,
+            'course' => [
+                'course_id' => $courseId,
+                'title' => $course['course_name']
+            ],
+            'formAction' => '/create/text/' . $course['course_id']
+        ];
+
+        $this->view('teacher/materials/material_text', $data);
+    }
+
+    public function storeText(array $params) {
+        $courseId = $params['course_id'];
+        $data = Request::post();
+
+        $this->validateText($data);
+
+        $this->validateQuiz(
+            $data['quiz'] ?? [],
+            [
+                'minimum_correct' => $data['minimum_correct'],
+                'max_attempts' => $data['max_attempts'],
+                'timer' => $data['timer'],
+                'reset_minutes' => $data['reset_minutes']
+            ]
+        );
+
+        $this->failIf(
+            Validator::fails(),
+            "/create/text/$courseId",
+            Validator::errors()
+        );
+
+        $materialId = Str::materialId();
+
+        $orderIndex = $this->materialsModel->findLastOrderIndex($courseId) + 1;
+
+        $transaction = Transaction::run(function () use ($courseId, $materialId, $data, $orderIndex) {
+
+            $this->materialsModel->create([
+                'material_id' => $materialId,
+                'course_id' => $courseId,
+                'title' => $data['title'],
+                'type' => 'text',
+                'order_index' => $orderIndex
+            ]);
+
+            $this->materialTextsModel->create([
+                'material_id' => $materialId,
+                'content' => $data['content']
+            ]);
+
+            $this->saveQuiz($materialId, $data);
+        });
+
+        $this->failIf(
+            !$transaction,
+            "/create/text/$courseId",
+            [
+                'error' => 'Gagal membuat material.'
+            ]
+        );
+
+        Flash::set(
+            'success',
+            'Material text berhasil ditambahkan.'
+        );
+
+        Redirect::to("/teacher/course/$courseId");
+    }
+
+    public function editText(array $params) {
+        $materialId = $params['material_id'];
+
+        $material = $this->materialsModel->findMaterial($materialId);
+        $course = $this->coursesModel->findCourse($material['course_id']);
+        $materialText = $this->materialTextsModel->findMaterialText($materialId);
+
+        $quiz = $this->getQuiz($materialId);
+
+        $data = [
+            'isEdit' => true,
+            'course' => [
+                'course_id' => $material['course_id'],
+                'title' => $course['course_name']
+            ],
+            'material' => [
+                'title' => $material['title'],
+                'content' => $materialText['content']
+            ],
+            'oldQuestions' => $quiz['questions'],
+            'settings' => $quiz['settings'],
+            'formAction' => '/create/text/' . $course['course_id']
+        ];
+
+        $this->view('teacher/materials/material_text', $data);
+    }
+
+    public function viewText(array $params) {
+        $materialId = $params['material_id'];
+
+        $material = $this->materialsModel->findMaterial($materialId);
+        $course = $this->coursesModel->findCourse($material['course_id']);
+        $materialText = $this->materialTextsModel->findMaterialText($materialId);
+
+        $quiz = $this->getQuiz($materialId);
+
+        $data = [
+            'course' => [
+                'course_id' => $course['course_id'],
+                'title' => $course['course_name'],
+                'status' => $course['status']
+            ],
+            'material' => [
+                'material_id' => $materialId,
+                'title' => $material['title'],
+                'content' => $materialText['content']
+            ],
+            'settings' => $quiz['settings'],
+            'questions' => $quiz['questions']
+        ];
+
+        $this->view('generic/text_view', $data);
+    }
+
+    public function createQuiz(array $params) {
+        $courseId = $params['course_id'];
+
+        $course = $this->coursesModel->findCourse($courseId);
+
+        $data = [
+            'isEdit' => false,
+            'course' => [
+                'course_id' => $courseId,
+                'title' => $course['course_name']
+            ],
+            'formAction' => '/create/quiz/' . $course['course_id']
+        ];
+        
+        $this->view('teacher/materials/quiz', $data);
+    }
+
+    public function storeQuiz(array $params) {
+        $courseId = $params['course_id'];
+        $data = Request::post();
+
+        Validator::validate(
+            $data,
+            [
+                'title' => 'required|max:120'
+            ],
+            [
+                'title' => 'Quiz title'
+            ]
+        );
+
+        $this->validateQuiz(
+            $data['quiz'] ?? [],
+            [
+                'minimum_correct' => $data['minimum_correct'],
+                'max_attempts' => $data['max_attempts'],
+                'timer' => $data['timer'],
+                'reset_minutes' => $data['reset_minutes']
+            ]
+        );
+
+        $this->failIf(
+            Validator::fails(),
+            "/create/quiz/$courseId",
+            Validator::errors()
+        );
+
+        $materialId = Str::materialId();
+
+        $orderIndex = $this->materialsModel->findLastOrderIndex($courseId) + 1;
+
+        $transaction = Transaction::run(function () use ($courseId, $materialId, $data, $orderIndex) {
+
+            $this->materialsModel->create([
+                'material_id' => $materialId,
+                'course_id' => $courseId,
+                'title' => $data['title'],
+                'type' => 'quiz',
+                'order_index' => $orderIndex
+            ]);
+
+            $this->saveQuiz($materialId, $data);
+        });
+
+        $this->failIf(
+            !$transaction,
+            "/create/quiz/$courseId",
+            [
+                'error' => 'Gagal membuat material.'
+            ]
+        );
+
+        Flash::set(
+            'success',
+            'Material text berhasil ditambahkan.'
+        );
+
+        Redirect::to("/teacher/course/$courseId");
+    }
+
+    public function editQuiz(array $params) {
+        $materialId = $params['material_id'];
+
+        $material = $this->materialsModel->findMaterial($materialId);
+        $course = $this->coursesModel->findCourse($material['course_id']);
+
+        $quiz = $this->getQuiz($materialId);
+
+        $data = [
+            'isEdit' => true,
+            'course' => [
+                'course_id' => $material['course_id'],
+                'title' => $course['course_name']
+            ],
+            'material' => [
+                'title' => $material['title']
+            ],
+            'oldQuestions' => $quiz['questions'],
+            'settings' => $quiz['settings'],
+            'formAction' => '/edit/quiz/' . $course['course_id']
+        ];
+
+        $this->view('teacher/materials/quiz', $data);
+    }
+
+    public function viewQuiz(array $params) {
+        $materialId = $params['material_id'];
+
+        $material = $this->materialsModel->findMaterial($materialId);
+        $course = $this->coursesModel->findCourse($material['course_id']);
+
+        $quiz = $this->getQuiz($materialId);
+
+        $data = [
+            'course' => [
+                'course_id' => $course['course_id'],
+                'title' => $course['course_name'],
+                'status' => $course['status']
+            ],
+            'material' => [
+                'material_id' => $materialId,
+                'title' => $material['title']
+            ],
+            'settings' => $quiz['settings'],
+            'questions' => $quiz['questions']
+        ];
+
+        $this->view('generic/quiz_view', $data);
+    }
+
+    public function createAssignment(array $params) {
+        $courseId = $params['course_id'];
+
+        $course = $this->coursesModel->findCourse($courseId);
+
+        $data = [
+            'isEdit' => false,
+            'course' => [
+                'course_id' => $courseId,
+                'title' => $course['course_name']
+            ],
+            'formAction' => '/create/assignment/' . $course['course_id']
+        ];
+
+        $this->view('teacher/materials/assignment', $data);
+    }
+
+    public function storeAssignment(array $params) {
+        $courseId = $params['course_id'];
+        $data = Request::post();
+
+        $this->validateAssignment($data);
+        $this->validateText($data);
+
+        $this->failIf(
+            Validator::fails(),
+            "/create/assignment/$courseId",
+            Validator::errors()
+        );
+
+        $materialId = Str::materialId();
+
+        $orderIndex = $this->materialsModel->findLastOrderIndex($courseId) + 1;
+
+        $transaction = Transaction::run(function () use ($courseId, $materialId, $data, $orderIndex) {
+            $this->materialsModel->create([
+                'material_id' => $materialId,
+                'course_id' => $courseId,
+                'title' => $data['title'],
+                'type' => 'assignment',
+                'order_index' => $orderIndex
+            ]);
+            
+            $this->assignmentsModel->create([
+                'material_id'    => $materialId,
+                'description'    => $data['content'],
+                'passing_score'  => $data['passing_score'],
+                'deadline_at'    => $data['deadline_at']
+            ]);
+        });
+
+        $this->failIf(
+            !$transaction,
+            "/create/assignment/$courseId",
+            [
+                'error' => 'Gagal membuat material.'
+            ]
+        );
+
+        Flash::set(
+            'success',
+            'Material text berhasil ditambahkan.'
+        );
+
+        Redirect::to("/teacher/course/$courseId");
+    }
+
+    public function editAssignment(array $params) {
+        $materialId = $params['material_id'];
+
+        $material = $this->materialsModel->findMaterial($materialId);
+        $course = $this->coursesModel->findCourse($material['course_id']);
+        $assignment = $this->assignmentsModel->findAssignment($materialId);
+
+        $data = [
+            'isEdit' => true,
+            'course' => [
+                'course_id' => $material['course_id'],
+                'title' => $course['course_name']
+            ],
+            'material' => [
+                'title' => $material['title'],
+                'content' => $assignment['description'],
+                'passing_score' => $assignment['passing_score'],
+                'deadline_at' => $assignment['deadline_at']
+            ],
+            'formAction' => '/edit/assignment/' . $course['course_id']
+        ];
+
+        $this->view('teacher/materials/assignment', $data);
+    }
+
+    private function validateAssignment(array $data) {
+        Validator::validate(
+            $data,
+            [
+                'title' => 'required|max:120'
+            ],
+            [
+                'title' => 'Assignment title'
+            ]
+        );
+
+        Validator::check(
+            !isset($data['passing_score']) || $data['passing_score'] === '',
+            'passing_score',
+            'Passing score is required.'
+        );
+
+        Validator::check(
+            (int) $data['passing_score'] < 0 || (int) $data['passing_score'] > 100,
+            'passing_score',
+            'Passing score must be between 0 and 100.'
+        );
+
+        Validator::check(
+            !isset($data['deadline_at']) || $data['deadline_at'] === '',
+            'deadline_at',
+            'Submission duration is required.'
+        );
+
+        Validator::check(
+            (int) $data['deadline_at'] < 1,
+            'deadline_at',
+            'Submission duration must be at least 1 hour.'
+        );
+    }
+
+    private function validateText(array $data): void {
+        Validator::validate(
+            $data,
+            [
+                'title' => 'required|max:120'
+            ],
+            [
+                'title' => 'Material title'
+            ]
+        );
+
+        $content = html_entity_decode($data['content'] ?? '');
+        $content = strip_tags($content);
+        $content = trim($content);
+
+        Validator::check(
+            $content === '',
+            'content',
+            'Content text wajib diisi.'
+        );
+    }
+
+    private function rollbackUploadedVideo(?string $videoPath): void {
+        if (!$videoPath) {
+            return;
+        }
+
+        File::delete(
+            UPLOAD_PATH . '/material-videos/' . $videoPath
+        );
+    }
+
+    private function uploadVideo(string $materialId): ?string {
+        if (!Request::hasFile('video_file')) {
+            return null;
+        }
+
+        $videoFile = File::upload(
+            Request::file('video_file'),
+            UPLOAD_PATH . '/material-videos',
+            $materialId
+        );
+
+        return $videoFile ?: null;
+    }
+
+    private function validateVideo(array $data, array $files): void {
+        Validator::validate(
+            $data,
+            [
+                'title' => 'required|max:120'
+            ],
+            [
+                'title' => 'Material title'
+            ]
+        );
+
+        if ($data['video_source'] === 'youtube') {
+            Validator::check(
+                empty($data['video_url']),
+                'video_url',
+                'Video URL wajib diisi.'
+            );
+
+            return;
+        }
+
+        Validator::validateFile(
+            $files,
+            [
+                'video_file' => 'required|mimes:mp4,webm|max:200'
+            ],
+            [
+                'video_file' => 'Video'
+            ]
+        );
+    }
+
+    private function getQuiz(string $materialId): array {
+        $quiz = $this->quizzesModel->findQuizByMaterialId($materialId);
+
+        return [
+            'settings' => [
+                'minimum_correct' => $quiz['minimum_correct'],
+                'total_questions' => $quiz['total_questions'],
+                'max_attempts' => $quiz['max_attempts'],
+                'reset_minutes' => $quiz['reset_minutes'],
+                'timer' => $quiz['timer'],
+            ],
+            'questions' => $this->getAllQuestion($quiz['quiz_id'])
+        ];
+    }
+
+    private function getAllQuestion(string $quizId) {
+        $questions = $this->quizQuestionsModel->getAllQuestionsWithOptions($quizId);
+
+        $oldQuestions = [];
+
+        foreach ($questions as $index => $question) {
+            $oldQuestions[$index + 1] = [
+                'question' => $question['question'],
+                'options' => [],
+                'correct' => null
+            ];
+
+            foreach ($question['options'] as $option) {
+                $oldQuestions[$index + 1]['options'][$option['option_order']] = $option['option_text'];
+
+                if ($option['is_correct']) {
+                    $oldQuestions[$index + 1]['correct'] = $option['option_order'];
+                }
+            }
+        }
+
+        return $oldQuestions;
     }
 
     private function validateQuiz(array $questions, array $settings): void {
@@ -468,7 +960,7 @@ class TeacherController extends Controller {
         }
     }
 
-    private function createQuiz(string $materialId, array $data): void {
+    private function saveQuiz(string $materialId, array $data): void {
         $quizId = $this->quizzesModel->create([
             'material_id' => $materialId,
             'minimum_correct' => $data['minimum_correct'],

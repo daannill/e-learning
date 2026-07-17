@@ -320,3 +320,41 @@
     padding-bottom:0;
     border-bottom:none;
 }
+
+.material-status-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+    color:white;
+    margin-left:10px;
+    vertical-align:middle;
+}
+
+.material-status-badge.status-draft{
+    background:var(--text-light);
+}
+
+.material-status-badge.status-published{
+    background:var(--success);
+}
+
+.material-status-badge.status-pending{
+    background:var(--warning);
+}
+
+.material-meta{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--text-light);
+    margin-bottom:20px;
+}
+
+.material-meta .icon{
+    width:16px;
+    height:16px;
+}

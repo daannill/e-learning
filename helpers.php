@@ -99,6 +99,22 @@ function css(array $files = []){
     }
 }
 
+function vendor(array $files = []){
+
+    if(empty($files)){
+        return;
+    }
+
+    foreach($files as $file){
+
+        echo '
+            <link
+                rel="stylesheet"
+                href="' . asset('vendor/' . $file . '.css') . '">
+        ';
+    }
+}
+
 function js(array $files = []){
 
     if(empty($files)){
@@ -242,4 +258,9 @@ function materialIcon(string $type): string {
         default:
             return 'i-file-text';
     }
+}
+
+function getYoutubeEmbedUrl($url) {
+    preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', (string) $url, $matches);
+    return isset($matches[1]) ? 'https://www.youtube.com/embed/' . $matches[1] : null;
 }

@@ -365,6 +365,7 @@
     justify-content:center;
 
     transition:.25s ease;
+    cursor: pointer;
 }
 
 .btn-course--full{

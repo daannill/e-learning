@@ -22,7 +22,7 @@ $scripts = ['preview_img']
 <main class="dashboard-content">
     <div class="dashboard-container dashboard-container--form">
 
-        <a href="#" class="back-link page-back-link">
+        <a href="<?= BASEURL . '/teacher/courses' ?>" class="back-link page-back-link">
             <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
             Back to My Courses
         </a>
