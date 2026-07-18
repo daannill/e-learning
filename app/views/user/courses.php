@@ -2,9 +2,11 @@
 
 $title = 'Explore Course';
 
-$styles = ['components/navbar', 'components/course_card', 'components/header', 'components/button'];
+$styles = ['components/navbar', 'components/course_card', 'components/header', 'components/button', 'components/pagination'];
 
-$scripts = ['user_open', 'save_course_button'];
+$scripts = ['user_open', 'save_course_button', 'filter'];
+
+require 'app/views/partials/icon.php';
 
 ?>
 
@@ -36,75 +38,110 @@ $scripts = ['user_open', 'save_course_button'];
 
         </div>
 
-        <div class="header-search">
+        <div class="course-filter-section" >
 
-            <input
-                type="text"
-                placeholder="Search wishlist..."
+            <form
+                method="GET"
+                id="filter-form"
             >
 
+                <div class="course-search">
+
+                    <svg class="icon" aria-hidden="true">
+                        <use href="#i-search"></use>
+                    </svg>
+
+                    <input
+                        type="search"
+                        name="search"
+                        placeholder="Search your courses..."
+                        value="<?= htmlspecialchars($search) ?>"
+                    >
+
+                </div>
+                
+                <div class="filter-section filter-toolbar" style="padding: 0px;">
+
+                    <div class="filter-group">
+
+                        <input
+                            type="hidden"
+                            id="status"
+                            name="category"
+                            value="<?= $category ?>"
+                        >
+
+                        <button
+                            type="button"
+                            class="filter-btn <?= $category === 'all' ? 'active' : '' ?>"
+                            onclick="setStatus('all')"
+                        >
+                            All
+                        </button>
+
+                        <?php foreach ($categories as $item) : ?>
+
+                            <button
+                                type="button"
+                                class="filter-btn <?= $category == $item['category_id'] ? 'active' : '' ?>"
+                                onclick="setStatus('<?= $item['category_id'] ?>')"
+                            >
+                                <?= htmlspecialchars($item['category_name']) ?>
+                            </button>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                    <div class="filter-select">
+
+                        <select
+                            name="sort"
+                            onchange="this.form.requestSubmit()"
+                        >
+
+                            <option
+                                value="newest"
+                                <?= $sort === 'newest' ? 'selected' : '' ?>
+                            >
+                                Newest
+                            </option>
+
+                            <option
+                                value="oldest"
+                                <?= $sort === 'oldest' ? 'selected' : '' ?>
+                            >
+                                Oldest
+                            </option>
+
+                            <option
+                                value="most_students"
+                                <?= $sort === 'most_students' ? 'selected' : '' ?>
+                            >
+                                Most Students
+                            </option>
+
+                            <option
+                                value="highest_rating"
+                                <?= $sort === 'highest_rating' ? 'selected' : '' ?>
+                            >
+                                Highest Rated
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </form>
+
         </div>
 
     </div>
 
 </section>
 
-
-<section class="course-filter-section">
-
-    <div class="container">
-
-        <div class="course-filter-wrapper">
-
-            <div class="course-filter">
-
-                <button class="filter-btn active">
-                    All Courses
-                </button>
-
-                <button class="filter-btn">
-                    Development
-                </button>
-
-                <button class="filter-btn">
-                    Design
-                </button>
-
-                <button class="filter-btn">
-                    Marketing
-                </button>
-
-                <button class="filter-btn">
-                    Business
-                </button>
-
-            </div>
-
-            <div class="course-sort">
-
-                <select>
-
-                    <option>
-                        Latest Courses
-                    </option>
-
-                    <option>
-                        Popular Courses
-                    </option>
-
-                    <option>
-                        Most Students
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
 
 <section>
 
@@ -238,6 +275,10 @@ $scripts = ['user_open', 'save_course_button'];
 
             </div>
 
+        <?php endif; ?>
+
+        <?php if (count($courses) > 0) : ?>
+            <?php include APP_PATH . '/app/views/partials/pagination.php' ?>
         <?php endif; ?>
 
     </div>

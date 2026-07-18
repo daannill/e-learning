@@ -276,4 +276,173 @@ class EnrollmentsModel extends Model {
             ':teacher_id' => $teacherId
         ]);
     }
+
+    public function getTeacherStudents(
+        string $teacherId,
+        string $status = 'all',
+        string $sort = 'newest',
+        string $search = '',
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+
+        $where = [
+            'c.instructor_id = :teacher_id',
+            'c.status = :course_status'
+        ];
+
+        $params = [
+            ':teacher_id' => $teacherId,
+            ':course_status' => 'published'
+        ];
+
+        if ($status === 'not_started') {
+            $where[] = 'e.total_completed = 0';
+        }
+
+        if ($status === 'in_progress') {
+            $where[] = 'e.total_completed > 0';
+            $where[] = 'e.total_completed < c.total_materials';
+        }
+
+        if ($status === 'completed') {
+            $where[] = 'e.total_completed >= c.total_materials';
+        }
+
+        if ($search !== '') {
+            $where[] = "(
+                CONCAT(
+                    ud.first_name,
+                    ' ',
+                    ud.last_name
+                ) LIKE :search
+                OR c.course_name LIKE :search
+            )";
+
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $orderBy = match ($sort) {
+            'oldest' => 'e.enrolled_at ASC',
+            default => 'e.enrolled_at DESC'
+        };
+
+        return $this->many("
+            SELECT
+                e.enrollment_id,
+                e.user_id,
+
+                CONCAT(
+                    ud.first_name,
+                    ' ',
+                    ud.last_name
+                ) AS student_name,
+
+                ud.email,
+
+                c.course_id,
+                c.course_name,
+                c.thumbnail,
+                c.difficulty,
+                c.status,
+                cat.category_name,
+
+                e.total_completed,
+                c.total_materials,
+
+                CASE
+                    WHEN c.total_materials = 0 THEN 0
+                    ELSE ROUND(
+                        (e.total_completed / c.total_materials) * 100
+                    )
+                END AS progress,
+
+                CASE
+                    WHEN e.total_completed = 0 THEN 'Not Started'
+                    WHEN e.total_completed >= c.total_materials THEN 'Completed'
+                    ELSE 'In Progress'
+                END AS progress_status,
+
+                e.last_material,
+                e.last_open,
+                e.enrolled_at
+
+            FROM enrollments e
+
+            JOIN courses c
+                ON e.course_id = c.course_id
+
+            JOIN categories cat
+                ON c.category_id = cat.category_id
+
+            JOIN user_details ud
+                ON e.user_id = ud.user_id
+
+            WHERE " . implode(' AND ', $where) . "
+
+            ORDER BY {$orderBy}
+
+            LIMIT {$limit} OFFSET {$offset}
+        ", $params);
+    }
+
+    public function countTeacherStudents(
+        string $teacherId,
+        string $status = 'all',
+        string $search = ''
+    ): int {
+
+        $where = [
+            'c.instructor_id = :teacher_id',
+            'c.status = :course_status'
+        ];
+
+        $params = [
+            ':teacher_id' => $teacherId,
+            ':course_status' => 'published'
+        ];
+
+        if ($status === 'not_started') {
+            $where[] = 'e.total_completed = 0';
+        }
+
+        if ($status === 'in_progress') {
+            $where[] = 'e.total_completed > 0';
+            $where[] = 'e.total_completed < c.total_materials';
+        }
+
+        if ($status === 'completed') {
+            $where[] = 'e.total_completed >= c.total_materials';
+        }
+
+        if ($search !== '') {
+            $where[] = "(
+                CONCAT(
+                    ud.first_name,
+                    ' ',
+                    ud.last_name
+                ) LIKE :search
+                OR c.course_name LIKE :search
+            )";
+
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $result = $this->one("
+            SELECT
+                COUNT(*) AS total_students
+
+            FROM enrollments e
+
+            JOIN courses c
+                ON e.course_id = c.course_id
+
+            JOIN user_details ud
+                ON e.user_id = ud.user_id
+
+            WHERE " . implode(' AND ', $where)
+        , $params);
+
+        return (int) $result['total_students'];
+    }
 }

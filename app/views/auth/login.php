@@ -75,24 +75,6 @@
 
             </div>
 
-            <div class="auth-options">
-
-                <label class="flex items-center gap-1">
-
-                    <input type="checkbox">
-
-                    <span>
-                        Remember me
-                    </span>
-
-                </label>
-
-                <a href="<?= BASEURL ?>" class="auth-link">
-                    Forgot Password?
-                </a>
-
-            </div>
-
             <button class="btn btn-primary w-full">
                 Sign In
             </button>

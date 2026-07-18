@@ -69,6 +69,11 @@ Routes::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
 Routes::get('/teacher/courses', [TeacherController::class, 'courses']);
 Routes::get('/teacher/course/{course_id}', [TeacherController::class, 'course']);
 Routes::get('/teacher/archived', [TeacherController::class, 'archived']);
+Routes::get('/teacher/archived/{course_id}', [TeacherController::class, 'archivedCourse']);
+Routes::get('/teacher/students', [TeacherController::class, 'students']);
+Routes::get('/teacher/ratings', [TeacherController::class, 'ratings']);
+Routes::get('/teacher/quiz-score', [TeacherController::class, 'quizAttempts']);
+Routes::get('/teacher/assignments', [TeacherController::class, 'assignments']);
 
 Routes::get('/create/course', [TeacherController::class, 'createCourse']);
 Routes::post('/create/course', [TeacherController::class, 'storeCourse']);

@@ -12,6 +12,17 @@ $styles = [
  
 $scripts = ['open_modal'];
 
+$permissions = [
+    'canEditCourse'      => in_array($course['status'], ['draft', 'rejected'], true),
+    'canManageMaterials' => in_array($course['status'], ['draft', 'rejected'], true),
+    'canPublish'         => in_array($course['status'], ['draft', 'rejected'], true),
+    'canSendReview'      => in_array($course['status'], ['draft', 'rejected'], true),
+    'canCancelReview'    => $course['status'] === 'pending',
+    'canDraft'           => $course['status'] === 'published',
+    'canArchive'         => in_array($course['status'], ['draft', 'published', 'rejected'], true),
+    'canRestore'         => $course['status'] === 'archived',
+];
+
 ?>
 
 <?php require 'app/views/layouts/header.php' ?>
@@ -71,9 +82,7 @@ $scripts = ['open_modal'];
                     </div>
  
                     <div class="flex items-center gap-1">
- 
-                        <?php if ($course['status'] === 'draft') : ?>
-
+                        <?php if ($permissions['canEditCourse']) : ?>
                             <a
                                 href="<?= BASEURL . '/edit/course/' . $course['course_id'] ?>"
                                 class="btn btn-outline btn-sm"
@@ -83,7 +92,9 @@ $scripts = ['open_modal'];
                                 </svg>
                                 Edit Course
                             </a>
+                        <?php endif; ?>
 
+                        <?php if ($permissions['canArchive']) : ?>
                             <form
                                 method="POST"
                                 action="<?= BASEURL . '/teacher/course/archive/' . $course['course_id'] ?>"
@@ -95,7 +106,37 @@ $scripts = ['open_modal'];
                                     Archive Course
                                 </button>
                             </form>
+                        <?php endif; ?>
 
+                        <?php if ($permissions['canRestore']) : ?>
+                            <form
+                                method="POST"
+                                action="<?= BASEURL . '/teacher/course/archive/' . $course['course_id'] ?>"
+                            >
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use href="#i-archive"></use>
+                                    </svg>
+                                    Restore
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($permissions['canDraft']) : ?>
+                            <form
+                                method="POST"
+                                action="<?= BASEURL . '/teacher/course/draft/' . $course['course_id'] ?>"
+                            >
+                                <button type="submit" class="btn btn-secondary btn-sm">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use href="#i-draft"></use>
+                                    </svg>
+                                    Draft
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($permissions['canPublish']) : ?>
                             <form
                                 method="POST"
                                 action="<?= BASEURL . '/teacher/course/publish/' . $course['course_id'] ?>"
@@ -108,9 +149,9 @@ $scripts = ['open_modal'];
                                     Publish
                                 </button>
                             </form>
+                        <?php endif; ?>
 
-                        <?php elseif ($course['status'] === 'published') : ?>
-
+                        <?php if ($permissions['canCancelReview']) : ?>
                             <form
                                 method="POST"
                                 action="<?= BASEURL . '/teacher/course/draft/' . $course['course_id'] ?>"
@@ -119,19 +160,7 @@ $scripts = ['open_modal'];
                                     <svg class="icon" aria-hidden="true">
                                         <use href="#i-draft"></use>
                                     </svg>
-                                    Draft
-                                </button>
-                            </form>
-
-                            <form
-                                method="POST"
-                                action="<?= BASEURL . '/teacher/course/archive/' . $course['course_id'] ?>"
-                            >
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <svg class="icon" aria-hidden="true">
-                                        <use href="#i-archive"></use>
-                                    </svg>
-                                    Archive
+                                    Cancel Review
                                 </button>
                             </form>
                         <?php endif; ?>
@@ -148,10 +177,15 @@ $scripts = ['open_modal'];
             <div class="section-header">
                 <h2>Course Materials</h2>
 
-                <button type="button" class="btn btn-primary btn-sm" onclick="openModal('materialTypeModal')">
-                    <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
-                    Add Material
-                </button>
+                <?php if ($permissions['canManageMaterials']) : ?>
+
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openModal('materialTypeModal')">
+                        <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                        Add Material
+                    </button>
+
+                <?php endif; ?>
+
             </div>
  
             <?php if (!empty($materials)) : ?>
@@ -183,31 +217,39 @@ $scripts = ['open_modal'];
                                 </div>
  
                                 <div class="flex items-center gap-1">
- 
                                     <a
-                                        href="<?= BASEURL . '/view/' . $material['type'] . '/' . $material['material_id'] ?>"
+                                        href="<?= BASEURL ?>/view/<?= $material['type'] ?>/<?= $material['material_id'] ?>"
                                         class="btn-course btn-outline"
                                     >
                                         View
                                     </a>
 
-                                    <a
-                                        href="<?= BASEURL . '/edit/' . $material['type'] . '/' . $material['material_id'] ?>"
-                                        class="btn-course btn-primary"
-                                    >
-                                        Edit
-                                    </a>
- 
-                                    <form
-                                        method="POST"
-                                        action="<?= BASEURL . '/delete/material/' . $material['material_id'] ?>"
-                                        onsubmit="return confirm('Delete material ini?')"
-                                    >
-                                        <?= csrf() ?>
-                                        <button type="submit" class="btn-course btn-secondary">
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <?php if ($permissions['canManageMaterials']) : ?>
+
+                                        <a
+                                            href="<?= BASEURL ?>/edit/<?= $material['type'] ?>/<?= $material['material_id'] ?>"
+                                            class="btn-course btn-primary"
+                                        >
+                                            Edit
+                                        </a>
+
+                                        <form
+                                            method="POST"
+                                            action="<?= BASEURL ?>/delete/material/<?= $material['material_id'] ?>"
+                                            onsubmit="return confirm('Delete material ini?')"
+                                        >
+                                            <?= csrf() ?>
+
+                                            <button
+                                                type="submit"
+                                                class="btn-course btn-secondary"
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
  
                                 </div>
  

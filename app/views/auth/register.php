@@ -2,6 +2,7 @@
 
     $title = 'Register';
     $styles = ['components/button', 'components/form', 'pages/auth/auth'];
+    $scripts = ['avatar_preview']
 
 ?>
 
@@ -33,9 +34,43 @@
             </div>
         <?php endif; ?>
 
-        <form action="<?= BASEURL ?>/register" method="POST">
+        <form action="<?= BASEURL ?>/register" method="POST" enctype="multipart/form-data">
 
             <?= csrf() ?>
+
+            <div class="avatar-upload">
+
+                <label for="avatarInput" class="avatar-upload-frame <?= invalid('avatar') ?>" id="avatarFrame">
+
+                    <img
+                        id="avatarPreview"
+                        src=""
+                        alt=""
+                        style="display:none;"
+                    >
+
+                    <svg class="icon avatar-upload-placeholder" id="avatarPlaceholder" aria-hidden="true">
+                        <use href="#i-upload"></use>
+                    </svg>
+
+                </label>
+
+                <label for="avatarInput" class="avatar-upload-label">
+                    Upload profile picture
+                </label>
+
+                <input
+                    type="file"
+                    name="avatar"
+                    id="avatarInput"
+                    accept="image/*"
+                    class="avatar-upload-input"
+                    onchange="previewAvatar(this)"
+                >
+
+                <?= error('avatar') ?>
+
+            </div>
 
             <div class="form-grid">
 

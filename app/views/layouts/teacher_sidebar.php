@@ -59,11 +59,11 @@
 
         <div class="menu-group">
             <span class="menu-label">People</span>
-            <a href="#" class="sidebar-item">
+            <a href="<?= BASEURL . '/teacher/students' ?>" class="sidebar-item <?= active('teacher/students') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>
                 <span>Students</span>
             </a>
-            <a href="#" class="sidebar-item">
+            <a href="<?= BASEURL . '/teacher/ratings' ?>" class="sidebar-item <?= active('teacher/ratings') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
                 <span>Reviews</span>
             </a>
@@ -71,11 +71,11 @@
 
         <div class="menu-group">
             <span class="menu-label">Assessment</span>
-            <a href="#" class="sidebar-item">
+            <a href="<?= BASEURL . '/teacher/quiz-score' ?>" class="sidebar-item <?= active('teacher/quiz-score') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
                 <span>Quiz Scores</span>
             </a>
-            <a href="#" class="sidebar-item">
+            <a href="<?= BASEURL . '/teacher/assignments' ?>" class="sidebar-item <?= active('teacher/assignment') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-check-square"></use></svg>
                 <span>Grading</span>
             </a>

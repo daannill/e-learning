@@ -4,7 +4,7 @@ $title = 'Wishlist';
 
 $styles = ['components/navbar', 'components/course_card', 'components/header', 'components/button'];
 
-$scripts = ['user_open', 'save_course_button'];
+$scripts = ['user_open', 'save_course_button', 'filter'];
 
 ?>
 
@@ -40,15 +40,6 @@ $scripts = ['user_open', 'save_course_button'];
 
         </div>
 
-        <div class="header-search">
-
-            <input
-                type="text"
-                placeholder="Search wishlist..."
-            >
-
-        </div>
-
     </div>
 
 </section>
@@ -57,51 +48,103 @@ $scripts = ['user_open', 'save_course_button'];
 
     <div class="container">
 
-        <div class="course-filter-wrapper">
+        <div class="course-filter-section">
 
-            <div class="course-filter">
+            <form
+                method="GET"
+                id="filter-form"
+            >
 
-                <button class="filter-btn active">
-                    All Courses
-                </button>
+                <div class="course-search">
 
-                <button class="filter-btn">
-                    Development
-                </button>
+                    <svg class="icon" aria-hidden="true">
+                        <use href="#i-search"></use>
+                    </svg>
 
-                <button class="filter-btn">
-                    Design
-                </button>
+                    <input
+                        type="search"
+                        name="search"
+                        placeholder="Search your courses..."
+                        value="<?= htmlspecialchars($search) ?>"
+                    >
 
-                <button class="filter-btn">
-                    Marketing
-                </button>
+                </div>
+                
+                <div class="filter-section filter-toolbar">
 
-                <button class="filter-btn">
-                    Business
-                </button>
+                    <div class="filter-group">
 
-            </div>
+                        <input
+                            type="hidden"
+                            id="status"
+                            name="category"
+                            value="<?= $category ?>"
+                        >
 
-            <div class="course-sort">
+                        <button
+                            type="button"
+                            class="filter-btn <?= $category === 'all' ? 'active' : '' ?>"
+                            onclick="setStatus('all')"
+                        >
+                            All
+                        </button>
 
-                <select>
+                        <?php foreach ($categories as $item) : ?>
 
-                    <option>
-                        Latest Courses
-                    </option>
+                            <button
+                                type="button"
+                                class="filter-btn <?= $category == $item['category_id'] ? 'active' : '' ?>"
+                                onclick="setStatus('<?= $item['category_id'] ?>')"
+                            >
+                                <?= htmlspecialchars($item['category_name']) ?>
+                            </button>
 
-                    <option>
-                        Popular Courses
-                    </option>
+                        <?php endforeach; ?>
 
-                    <option>
-                        Most Students
-                    </option>
+                    </div>
 
-                </select>
+                    <div class="filter-select">
 
-            </div>
+                        <select
+                            name="sort"
+                            onchange="this.form.requestSubmit()"
+                        >
+
+                            <option
+                                value="newest"
+                                <?= $sort === 'newest' ? 'selected' : '' ?>
+                            >
+                                Newest
+                            </option>
+
+                            <option
+                                value="oldest"
+                                <?= $sort === 'oldest' ? 'selected' : '' ?>
+                            >
+                                Oldest
+                            </option>
+
+                            <option
+                                value="most_students"
+                                <?= $sort === 'most_students' ? 'selected' : '' ?>
+                            >
+                                Most Students
+                            </option>
+
+                            <option
+                                value="highest_rating"
+                                <?= $sort === 'highest_rating' ? 'selected' : '' ?>
+                            >
+                                Highest Rated
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </form>
 
         </div>
 

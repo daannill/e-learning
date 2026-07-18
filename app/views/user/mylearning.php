@@ -68,7 +68,7 @@ $scripts = ['user_open'];
 
     <!-- FILTER -->
 
-    <div class="course-filter-section">
+    <div class="course-filter-section" style="padding-bottom: 20px;">
 
         <div class="course-filter-wrapper">
 

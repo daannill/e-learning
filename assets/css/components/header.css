@@ -128,7 +128,26 @@
 
     gap:12px;
 
-    flex-wrap:wrap;
+    display:flex;
+    flex-wrap:nowrap;
+    width:480px;
+    max-width:100%;
+    overflow-x:auto;
+    scrollbar-width:thin;
+}
+
+.filter-group::-webkit-scrollbar{
+    height:6px;
+}
+
+.filter-group::-webkit-scrollbar-thumb{
+    background:var(--border);
+    border-radius:999px;
+}
+
+.filter-group .filter-btn{
+    flex-shrink:0;
+    white-space:nowrap;
 }
 
 

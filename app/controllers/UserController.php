@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\CategoriesModel;
 use App\Models\EnrollmentsModel;
 use App\Models\SavedCoursesModel;
 use App\Models\UserDetailsModel;
@@ -18,6 +19,7 @@ class UserController extends Controller{
     private $userDetailsModel;
     private $userProgressModel;
     private $savedCoursesModel;
+    private $categoriesModel;
 
     protected array $middleware = [
         'auth' => [
@@ -30,6 +32,7 @@ class UserController extends Controller{
         $this->enrollmentsModel = new EnrollmentsModel();
         $this->userProgressModel = new UserProgressModel();
         $this->savedCoursesModel = new SavedCoursesModel();
+        $this->categoriesModel = new CategoriesModel();
     }
 
     /*
@@ -41,11 +44,48 @@ class UserController extends Controller{
     public function wishlist() {
         $userId = Auth::info('id');
 
-        $courses = $this->savedCoursesModel->getAllSavedCourses($userId);
+        $category = Request::get('category', 'all');
+        $sort = Request::get('sort', 'newest');
+        $search = trim(Request::get('search', ''));
 
-        $this->view('user/wishlist', [
-            'courses' => $courses,
-        ]);
+        $limit = 8;
+
+        $categories = $this->categoriesModel->getAllCategories();
+
+        $totalCourses = $this->savedCoursesModel->countSavedCourses(
+            $userId,
+            $category,
+            $search
+        );
+
+        $pagination = $this->paginate(
+            $totalCourses,
+            $limit
+        );
+
+        $courses = $this->savedCoursesModel->getAllSavedCourses(
+            $userId,
+            $category,
+            $sort,
+            $search,
+            $pagination['limit'],
+            $pagination['offset']
+        );
+
+        $this->view(
+            'user/wishlist',
+            [
+                'courses' => $courses,
+                'totalCourses' => $totalCourses,
+                'totalPages' => $pagination['total_pages'],
+                'page' => $pagination['page'],
+                'limit' => $pagination['limit'],
+                'sort' => $sort,
+                'search' => $search,
+                'categories' => $categories,
+                'category' => $category
+            ]
+        );
     }
 
     /*
@@ -150,5 +190,27 @@ class UserController extends Controller{
             'success' => true,
             'saved' => true,
         ]);
+    }
+
+    private function paginate(
+        int $totalItems,
+        int $limit
+    ): array {
+
+        $page = max(1, (int) Request::get('page', 1));
+
+        $totalPages = max(
+            1,
+            (int) ceil($totalItems / $limit)
+        );
+
+        $page = min($page, $totalPages);
+
+        return [
+            'page' => $page,
+            'limit' => $limit,
+            'offset' => ($page - 1) * $limit,
+            'total_pages' => $totalPages
+        ];
     }
 }

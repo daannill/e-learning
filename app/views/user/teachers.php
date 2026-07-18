@@ -49,7 +49,7 @@ $scripts = ['user_open'];
 
 </section>
 
-<section class="course-filter-section">
+<section class="course-filter-section" style="padding-bottom: 20px;">
 
     <div class="container">
 

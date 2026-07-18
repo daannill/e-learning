@@ -282,7 +282,9 @@ $scripts = ['filter'];
 
             <?php endif; ?>
 
-            <?php include APP_PATH . '/app/views/partials/pagination.php' ?>
+            <?php if ($totalCourses > 0) : ?>
+                <?php include APP_PATH . '/app/views/partials/pagination.php' ?>
+            <?php endif; ?>
             
         </section>
 

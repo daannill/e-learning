@@ -10,6 +10,7 @@ use Core\Transaction;
 use Core\Validator;
 use Core\Request;
 use Core\Session;
+use Core\File;
 
 use App\Models\UserDetailsModel;
 use App\Models\LoginUsersModel;
@@ -104,6 +105,13 @@ class AuthController extends Controller {
 
         Validator::validate($data, $rules, $label);
 
+        Validator::validateFile(
+        Request::file(),
+        [
+            'avatar' => 'image|mimes:jpg,jpeg,png|max:2'
+        ]
+    );
+
         Validator::check($this->loginUsersModel->findUserByEmail($data['email']), 'email', 'Email Sudah Digunakan');
         Validator::check($data['password1'] !== $data['password2'], [
             'password1' => 'Password Tidak Sama',
@@ -115,7 +123,25 @@ class AuthController extends Controller {
         $userId = Str::userId();
         $password = password_hash($data['password1'], PASSWORD_DEFAULT);
 
-        $transaction = Transaction::run(function () use ($userId, $password, $data) {
+        $avatar = '';
+
+        if (Request::hasFile('avatar')) {
+            $avatar = File::upload(
+                Request::file('avatar'),
+                UPLOAD_PATH . '/profiles',
+                $userId
+            );
+
+            $this->failIf(
+                !$avatar,
+                '/register',
+                [
+                    'photo' => 'Upload photo gagal.'
+                ]
+            );
+        }
+
+        $transaction = Transaction::run(function () use ($userId, $password, $data, $avatar) {
             $this->loginUsersModel->create([
                 'id' => $userId,
                 'email' => $data['email'],
@@ -130,11 +156,23 @@ class AuthController extends Controller {
                 'lname' => $data['lname'],
                 'email' => $data['email'],
                 'gender' => $data['gender'],
+                'profile_picture' => $avatar,
                 'address' => $data['address']
             ]);
         });
 
-        $this->redirectIf(!$transaction, '/register', 'error', 'Register Gagal, Coba Lagi Nanti!');
+        if (!$transaction) {
+            File::delete(
+                UPLOAD_PATH . '/profiles/' . $avatar
+            );
+
+            $this->redirectIf(
+                true,
+                '/register',
+                'error',
+                'Register Gagal, Coba Lagi Nanti!'
+            );
+        }
 
         Flash::set('success', 'Register Berhasil, Silahkan Login!');
         Redirect::to('/login');

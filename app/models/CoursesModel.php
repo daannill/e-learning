@@ -6,33 +6,65 @@ use Core\Model;
 
 class CoursesModel extends Model{
 
-    public function getAllPublishedCourses(?string $userId = null): array {
+    public function getAllPublishedCourses(
+        ?string $userId = null,
+        string $category = 'all',
+        string $sort = 'newest',
+        string $search = '',
+        int $limit = 8,
+        int $offset = 0
+    ): array {
+
         $userColumns = '';
         $userJoins = '';
+
+        $where = [
+            "c.status = 'published'"
+        ];
+
         $params = [];
- 
+
         if ($userId !== null) {
             $userColumns = ",
                 (e.course_id IS NOT NULL) AS is_enrolled,
                 (sc.course_id IS NOT NULL) AS is_saved";
- 
+
             $userJoins = "
                 LEFT JOIN enrollments e
                     ON c.course_id = e.course_id
                     AND e.user_id = :user_id
- 
+
                 LEFT JOIN saved_courses sc
                     ON c.course_id = sc.course_id
                     AND sc.user_id = :user_id";
- 
+
             $params[':user_id'] = $userId;
         }
- 
+
+        if ($category !== 'all') {
+            $where[] = 'c.category_id = :category_id';
+            $params[':category_id'] = $category;
+        }
+
+        if ($search !== '') {
+            $where[] = 'c.course_name LIKE :search';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $orderBy = match ($sort) {
+            'oldest' => 'c.created_at ASC',
+            default => 'c.created_at DESC'
+        };
+
         return $this->many("
             SELECT
                 c.course_id,
                 cat.category_name,
-                CONCAT(ud.first_name, ' ', ud.last_name) AS teacher_name,
+                CONCAT(
+                    ud.first_name,
+                    ' ',
+                    ud.last_name
+                ) AS teacher_name,
                 tp.job_title,
                 c.course_name,
                 c.short_description,
@@ -43,23 +75,59 @@ class CoursesModel extends Model{
                 c.average_rating,
                 c.created_at
                 $userColumns
- 
+
             FROM courses c
- 
+
             JOIN categories cat
                 ON c.category_id = cat.category_id
- 
+
             JOIN user_details ud
                 ON c.instructor_id = ud.user_id
- 
+
             JOIN teacher_profiles tp
                 ON c.instructor_id = tp.user_id
+
             $userJoins
- 
-            WHERE c.status = 'published'
- 
-            ORDER BY c.created_at DESC
+
+            WHERE " . implode(' AND ', $where) . "
+
+            ORDER BY {$orderBy}
+
+            LIMIT {$limit} OFFSET {$offset}
         ", $params);
+    }
+
+    public function countPublishedCourses(
+        string $category = 'all',
+        string $search = ''
+    ): int {
+
+        $where = [
+            "c.status = 'published'"
+        ];
+
+        $params = [];
+
+        if ($category !== 'all') {
+            $where[] = 'c.category_id = :category_id';
+            $params[':category_id'] = $category;
+        }
+
+        if ($search !== '') {
+            $where[] = 'c.course_name LIKE :search';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $result = $this->one("
+            SELECT
+                COUNT(*) AS total_courses
+
+            FROM courses c
+
+            WHERE " . implode(' AND ', $where)
+        , $params);
+
+        return (int) $result['total_courses'];
     }
 
     public function create(array $data): bool {
@@ -261,7 +329,8 @@ class CoursesModel extends Model{
     ): array {
 
         $where = [
-            'c.instructor_id = :teacher_id'
+            'c.instructor_id = :teacher_id',
+            "c.status != 'archived'"
         ];
 
         $params = [

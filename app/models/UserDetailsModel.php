@@ -13,6 +13,7 @@ class UserDetailsModel extends Model {
             'last_name' => $data['lname'],
             'email' => $data['email'],
             'gender' => $data['gender'],
+            'profile_picture' => $data['profile_picture'],
             'address' => $data['address']
         ]);
     }

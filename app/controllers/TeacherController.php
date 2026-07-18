@@ -13,6 +13,8 @@ use App\Models\MaterialVideosModel;
 use App\Models\QuizOptionsModel;
 use App\Models\QuizQuestionsModel;
 use App\Models\QuizzesModel;
+use App\Models\RatingsModel;
+use App\Models\UserQuizAttemptsModel;
 use Core\Auth;
 use Core\Controller;
 use Core\Request;
@@ -36,6 +38,8 @@ class TeacherController extends Controller {
     private $quizOptionsModel;
     private $materialTextsModel;
     private $assignmentsModel;
+    private $ratingsModel;
+    private $userQuizAttemptsModel;
 
     protected array $middleware = [];
 
@@ -51,6 +55,8 @@ class TeacherController extends Controller {
         $this->quizOptionsModel = new QuizOptionsModel();
         $this->materialTextsModel = new MaterialTextsModel();
         $this->assignmentsModel = new AssignmentsModel();
+        $this->ratingsModel = new RatingsModel();
+        $this->userQuizAttemptsModel = new UserQuizAttemptsModel();
     }
 
     public function dashboard() {
@@ -165,6 +171,194 @@ class TeacherController extends Controller {
 
         $this->view(
             'teacher/archived_course',
+            $data
+        );
+    }
+
+    public function archivedCourse(array $params) {
+        $courseId = $params['course_id'];
+        $teacherId = Auth::info('id');
+
+        $course = $this->getCourseAndAuthorized($courseId, $teacherId);
+
+        $materials = $this->materialsModel->getAllMaterials($courseId);
+
+        $data = [
+            'course' => $course,
+            'materials' => $materials
+        ];
+        
+        $this->view('teacher/course_details', $data);
+    }
+
+    public function students() {
+        $teacherId = Auth::info('id');
+
+        $status = Request::get('status', 'all');
+        $sort = Request::get('sort', 'newest');
+        $search = trim(Request::get('search', ''));
+
+        $limit = 10;
+
+        $totalStudents = $this->enrollmentsModel->countTeacherStudents(
+            $teacherId,
+            $status,
+            $search
+        );
+
+        $pagination = $this->paginate(
+            $totalStudents,
+            $limit
+        );
+
+        $students = $this->enrollmentsModel->getTeacherStudents(
+            $teacherId,
+            $status,
+            $sort,
+            $search,
+            $pagination['limit'],
+            $pagination['offset']
+        );
+
+        $data = [
+            'students' => $students,
+            'totalStudents' => $totalStudents,
+            'totalPages' => $pagination['total_pages'],
+            'page' => $pagination['page'],
+            'limit' => $pagination['limit'],
+            'status' => $status,
+            'sort' => $sort,
+            'search' => $search
+        ];
+
+        $this->view(
+            'generic/students',
+            $data
+        );
+    }
+
+    public function ratings() {
+        $teacherId = Auth::info('id');
+
+        $sort = Request::get('sort', 'newest');
+        $search = trim(Request::get('search', ''));
+
+        $limit = 10;
+
+        $totalRatings = $this->ratingsModel->countTeacherRatings(
+            $teacherId,
+            $search
+        );
+
+        $pagination = $this->paginate(
+            $totalRatings,
+            $limit
+        );
+
+        $ratings = $this->ratingsModel->getTeacherRatings(
+            $teacherId,
+            $sort,
+            $search,
+            $pagination['limit'],
+            $pagination['offset']
+        );
+
+        $data = [
+            'ratings' => $ratings,
+            'totalRatings' => $totalRatings,
+            'totalPages' => $pagination['total_pages'],
+            'page' => $pagination['page'],
+            'limit' => $pagination['limit'],
+            'sort' => $sort,
+            'search' => $search
+        ];
+
+        $this->view(
+            'generic/ratings',
+            $data
+        );
+    }
+
+    public function quizAttempts() {
+        $teacherId = Auth::info('id');
+
+        $sort = Request::get('sort', 'newest');
+        $search = trim(Request::get('search', ''));
+
+        $limit = 10;
+
+        $totalAttempts = $this->userQuizAttemptsModel->countTeacherQuizAttempts(
+            $teacherId,
+            $search
+        );
+
+        $pagination = $this->paginate(
+            $totalAttempts,
+            $limit
+        );
+
+        $attempts = $this->userQuizAttemptsModel->getTeacherQuizAttempts(
+            $teacherId,
+            $sort,
+            $search,
+            $pagination['limit'],
+            $pagination['offset']
+        );
+
+        $data = [
+            'attempts' => $attempts,
+            'totalAttempts' => $totalAttempts,
+            'totalPages' => $pagination['total_pages'],
+            'page' => $pagination['page'],
+            'limit' => $pagination['limit'],
+            'sort' => $sort,
+            'search' => $search
+        ];
+
+        $this->view(
+            'generic/quiz_attempts',
+            $data
+        );
+    }
+
+    public function assignments() {
+        $teacherId = Auth::info('id');
+
+        $sort = Request::get('sort', 'newest');
+        $search = trim(Request::get('search', ''));
+
+        $limit = 10;
+
+        $totalAttempts = $this->assignmentAttemptsModel->countTeacherAssignmentAttempts(
+            $teacherId,
+            $search
+        );
+
+        $pagination = $this->paginate(
+            $totalAttempts,
+            $limit
+        );
+
+        $attempts = $this->assignmentAttemptsModel->getTeacherAssignmentAttempts(
+            $teacherId,
+            $sort,
+            $search,
+            $pagination['limit'],
+            $pagination['offset']
+        );
+
+        $data = [
+            'attempts' => $attempts,
+            'totalAttempts' => $totalAttempts,
+            'totalPages' => $pagination['total_pages'],
+            'page' => $pagination['page'],
+            'limit' => $pagination['limit'],
+            'sort' => $sort,
+            'search' => $search
+        ];
+
+        $this->view(
+            'teacher/assignments',
             $data
         );
     }
