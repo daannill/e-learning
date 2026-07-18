@@ -48,4 +48,18 @@ class File {
     public static function exists(string $path): bool {
         return is_file($path);
     }
+
+    public static function rename(string $from, string $to) {
+        if (!file_exists($from)) {
+            return false;
+        }
+
+        $directory = dirname($to);
+
+        if (!is_dir($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        return rename($from, $to);
+    }
 }

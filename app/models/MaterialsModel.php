@@ -51,7 +51,47 @@ class MaterialsModel extends Model {
         );
     }
 
-     public function findMaterialIdByCourseIdAndOrderIndex(string $courseId, int $orderIndex): ?string {
+    public function updateMaterial(string $materialId, array $data): bool {
+        return $this->update(
+            'materials',
+            [
+                'title' => $data['title'],
+                'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
+
+    public function deleteMaterial(string $materialId): bool {
+        return $this->delete(
+            'materials',
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
+
+    public function reorderMaterial(
+        string $courseId,
+        int $orderIndex
+    ): bool {
+        return $this->run(
+            "
+            UPDATE materials
+            SET order_index = order_index - 1
+            WHERE course_id = :course_id
+            AND order_index > :order_index
+            ",
+            [
+                ':course_id' => $courseId,
+                ':order_index' => $orderIndex
+            ]
+        );
+    }
+
+    public function findMaterialIdByCourseIdAndOrderIndex(string $courseId, int $orderIndex): ?string {
         $result = $this->findByOne(
             'materials',
             ['material_id'],

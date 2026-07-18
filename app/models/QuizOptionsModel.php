@@ -14,4 +14,19 @@ class QuizOptionsModel extends Model {
             'is_correct' => $data['is_correct']
         ]);
     }
+
+    public function deleteByQuizId(int $quizId): bool {
+        return $this->run(
+            "
+            DELETE qo
+            FROM quiz_options qo
+            INNER JOIN quiz_questions qq
+                ON qq.question_id = qo.question_id
+            WHERE qq.quiz_id = :quiz_id
+            ",
+            [
+                ':quiz_id' => $quizId
+            ]
+        );
+    }
 }

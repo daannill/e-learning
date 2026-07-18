@@ -22,4 +22,27 @@ class AssignmentsModel extends Model {
             ['material_id' => $materialId]
         );
     }
+
+    public function updateAssignment(string $materialId, array $data): bool {
+        return $this->update(
+            'assignments',
+            [
+                'description'   => $data['description'],
+                'passing_score' => $data['passing_score'],
+                'deadline_at'   => $data['deadline_at']
+            ],
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
+
+    public function deleteAssignment(string $materialId): bool {
+        return $this->delete(
+            'assignments',
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
 }

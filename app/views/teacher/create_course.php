@@ -9,7 +9,7 @@ $styles = [
     'components/teacher_layout',
 ];
 
-$scripts = ['preview_img']
+$scripts = ['preview_img'];
 
 ?>
 
@@ -29,12 +29,12 @@ $scripts = ['preview_img']
 
         <div class="dashboard-topbar">
             <div class="dashboard-greeting">
-                <h1>Add New Course</h1>
+                <h1><?= $isEdit ? 'Edit' : 'Add New' ?> Course</h1>
                 <p>Fill in the details below to create a new course.</p>
             </div>
         </div>
 
-        <form action="<?= BASEURL . '/create/course' ?>" method="post" class="card" enctype="multipart/form-data" novalidate>
+        <form action="<?= BASEURL . $formAction ?>" method="post" class="card" enctype="multipart/form-data" novalidate>
             <?= csrf() ?>
 
             <div class="form-section">
@@ -53,12 +53,14 @@ $scripts = ['preview_img']
                         <img
                             id="thumbnail-preview"
                             class="upload-preview"
-                            src=""
+                            src="<?= !empty($course['thumbnail'])
+                                ? BASEURL . '/uploads/course-thumbnails/' . $course['thumbnail']
+                                : '' ?>"
                             alt="Thumbnail Preview"
-                            hidden
+                            <?= empty($course['thumbnail']) ? 'hidden' : '' ?>
                         >
 
-                        <div class="upload-placeholder">
+                        <div class="upload-placeholder" <?= !empty($course['thumbnail']) ? 'hidden' : '' ?>>
 
                             <svg class="icon" aria-hidden="true">
                                 <use href="#i-upload"></use>
@@ -95,7 +97,7 @@ $scripts = ['preview_img']
                     <div
                         class="upload-actions"
                         id="upload-actions"
-                        hidden
+                        <?= empty($course['thumbnail']) ? 'hidden' : '' ?>
                     >
                         <button
                             type="button"
@@ -134,7 +136,7 @@ $scripts = ['preview_img']
                         name="title"
                         placeholder="e.g. Learn PHP from Scratch"
                         maxlength="120"
-                        value="<?= old('title') ?>"
+                        value="<?= htmlspecialchars(old('title') ?: ($course['course_name'] ?? '')) ?>"
                         required
                     >
 
@@ -169,7 +171,7 @@ $scripts = ['preview_img']
 
                                 <option
                                     value="<?= $category['category_id'] ?>"
-                                    <?= old('category') === $category['category_id'] ? 'selected' : '' ?>
+                                    <?= (old('category') ?: ($course['category_id'] ?? '')) == $category['category_id'] ? 'selected' : '' ?>
                                 >
                                     <?= htmlspecialchars($category['category_name']) ?>
                                 </option>
@@ -205,21 +207,21 @@ $scripts = ['preview_img']
 
                             <option
                                 value="beginner"
-                                <?= old('difficulty') === 'beginner' ? 'selected' : '' ?>
+                                <?= (old('difficulty') ?: ($course['difficulty'] ?? '')) == 'beginner' ? 'selected' : '' ?>
                             >
                                 Beginner
                             </option>
 
                             <option
                                 value="intermediate"
-                                <?= old('difficulty') === 'intermediate' ? 'selected' : '' ?>
+                                <?= (old('difficulty') ?: ($course['difficulty'] ?? '')) == 'intermediate' ? 'selected' : '' ?>
                             >
                                 Intermediate
                             </option>
 
                             <option
                                 value="advanced"
-                                <?= old('difficulty') === 'advanced' ? 'selected' : '' ?>
+                                <?= (old('difficulty') ?: ($course['difficulty'] ?? '')) == 'advanced' ? 'selected' : '' ?>
                             >
                                 Advanced
                             </option>
@@ -246,7 +248,7 @@ $scripts = ['preview_img']
                         maxlength="200"
                         placeholder="A one or two sentence summary that will appear on the course card..."
                         required
-                    ><?= old('short_description') ?></textarea>
+                    ><?= htmlspecialchars(old('short_description') ?: ($course['short_description'] ?? '')) ?></textarea>
 
                     <?php if (hasFlash('errors.short_description')) : ?>
 
@@ -276,7 +278,7 @@ $scripts = ['preview_img']
                         maxlength="2000"
                         placeholder="Describe what students will learn, how the course is structured, prerequisites, and who this course is for..."
                         required
-                    ><?= old('description') ?></textarea>
+                    ><?= htmlspecialchars(old('description') ?: ($course['description'] ?? '')) ?></textarea>
 
                     <?php if (hasFlash('errors.description')) : ?>
 
@@ -294,9 +296,13 @@ $scripts = ['preview_img']
             </div>
 
             <div class="form-actions">
-                <p class="form-hint form-actions-note">Course will be saved as a draft — you can publish it after adding materials.</p>
-                <a href="#" class="btn btn-outline">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create Course</button>
+                <p class="form-hint form-actions-note">
+                    <?= !$isEdit
+                        ? 'Course will be saved as a draft — you can publish it after adding materials.'
+                        : 'Update your course information. Changes are saved immediately.' ?>
+                </p>
+                <a href="<?= BASEURL . $cancelUrl ?>" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Edit' : 'Create' ?> Course</button>
             </div>
 
         </form>

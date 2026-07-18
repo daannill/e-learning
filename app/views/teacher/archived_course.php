@@ -26,13 +26,9 @@ $scripts = ['filter'];
 
         <div class="dashboard-topbar">
             <div class="dashboard-greeting">
-                <h1>My Courses</h1>
-                <p>Manage and track all the courses you've created.</p>
+                <h1>Archived Course</h1>
+                <p>Manage and restore the courses you've archived.</p>
             </div>
-            <a href="<?= BASEURL . '/create/course' ?>" class="btn btn-primary">
-                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
-                Add Course
-            </a>
         </div>
 
         <section class="dashboard-section">
@@ -60,49 +56,6 @@ $scripts = ['filter'];
                     </div>
                     
                     <div class="filter-section filter-toolbar">
-
-                        <div class="filter-group">
-
-                            <input
-                                type="hidden"
-                                id="status"
-                                name="status"
-                                value="<?= $status ?>"
-                            >
-
-                            <button
-                                type="button"
-                                class="filter-btn <?= $status === 'all' ? 'active' : '' ?>"
-                                onclick="setStatus('all')"
-                            >
-                                All
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filter-btn <?= $status === 'published' ? 'active' : '' ?>"
-                                onclick="setStatus('published')"
-                            >
-                                Published
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filter-btn <?= $status === 'draft' ? 'active' : '' ?>"
-                                onclick="setStatus('draft')"
-                            >
-                                Draft
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filter-btn <?= $status === 'pending' ? 'active' : '' ?>"
-                                onclick="setStatus('pending')"
-                            >
-                                Pending Review
-                            </button>
-
-                        </div>
 
                         <div class="filter-select">
 
@@ -236,7 +189,7 @@ $scripts = ['filter'];
 
                 </div>
 
-            <?php elseif ($totalCourses === 0 && $status == '' && $sort == '') : ?>
+            <?php elseif ($totalCourses === 0 && $sort == '') : ?>
 
                 <div class="empty-state">
 
@@ -247,12 +200,19 @@ $scripts = ['filter'];
                         </div>
 
                         <h2 class="empty-state-title">
-                            No Archived Courses
+                            No Courses Yet
                         </h2>
 
                         <p class="empty-state-text">
-                            You don't have any archived courses. Archived courses will appear here when you archive them.
+                            You haven't created any courses yet. Start creating your first course and share your knowledge with students.
                         </p>
+
+                        <a
+                            href="<?= BASEURL . '/teacher/course/create' ?>"
+                            class="btn btn-primary"
+                        >
+                            Create Course
+                        </a>
 
                     </div>
 

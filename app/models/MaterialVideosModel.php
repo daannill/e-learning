@@ -21,4 +21,26 @@ class MaterialVideosModel extends Model {
             'video_url' => $data['video_url']
         ]);
     }
+
+    public function updateMaterialVideo(string $materialId, array $data): bool {
+        return $this->update(
+            'material_videos',
+            [
+                'source_type' => $data['source_type'],
+                'video_url'   => $data['video_url']
+            ],
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
+
+    public function deleteMaterialVideo(string $materialId): bool {
+        return $this->delete(
+            'material_videos',
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
 }

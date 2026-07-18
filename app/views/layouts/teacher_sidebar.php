@@ -51,7 +51,7 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-book"></use></svg>
                 <span>My Courses</span>
             </a>
-            <a href="#" class="sidebar-item">
+            <a href="<?= BASEURL . '/teacher/archived' ?>" class="sidebar-item <?= active('teacher/archived') ?>">
                 <svg class="icon" aria-hidden="true"><use href="#i-archive"></use></svg>
                 <span>Archived Courses</span>
             </a>

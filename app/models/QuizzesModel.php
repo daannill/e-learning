@@ -22,6 +22,31 @@ class QuizzesModel extends Model {
         );
     }
 
+    public function deleteQuiz(string $materialId): bool {
+        return $this->delete(
+            'quizzes',
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
+
+    public function updateQuiz(int $quizId, array $data): bool {
+        return $this->update(
+            'quizzes',
+            [
+                'minimum_correct' => $data['minimum_correct'],
+                'total_questions' => $data['total_questions'],
+                'max_attempts' => $data['max_attempts'],
+                'reset_minutes' => $data['reset_minutes'],
+                'timer' => $data['timer']
+            ],
+            [
+                'quiz_id' => $quizId
+            ]
+        );
+    }
+
     public function create(array $data): int|false {
         $insert = $this->insert('quizzes', [
             'material_id' => $data['material_id'],

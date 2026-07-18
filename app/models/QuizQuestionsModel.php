@@ -67,4 +67,17 @@ class QuizQuestionsModel extends Model {
 
         return $this->lastInsertId();
     }
+
+    public function deleteByQuizId(int $quizId): bool {
+        return $this->run(
+            "
+            DELETE qq
+            FROM quiz_questions qq
+            WHERE qq.quiz_id = :quiz_id
+            ",
+            [
+                ':quiz_id' => $quizId
+            ]
+        );
+    }
 }

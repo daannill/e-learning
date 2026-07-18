@@ -75,7 +75,7 @@ $scripts = ['open_modal'];
                         <?php if ($course['status'] === 'draft') : ?>
 
                             <a
-                                href="<?= BASEURL . '/teacher/course/edit/' . $course['course_id'] ?>"
+                                href="<?= BASEURL . '/edit/course/' . $course['course_id'] ?>"
                                 class="btn btn-outline btn-sm"
                             >
                                 <svg class="icon" aria-hidden="true">
@@ -200,11 +200,12 @@ $scripts = ['open_modal'];
  
                                     <form
                                         method="POST"
-                                        action="<?= BASEURL . '/teacher/material/archive/' . $material['material_id'] ?>"
-                                        onsubmit="return confirm('Arsipkan material ini?')"
+                                        action="<?= BASEURL . '/delete/material/' . $material['material_id'] ?>"
+                                        onsubmit="return confirm('Delete material ini?')"
                                     >
+                                        <?= csrf() ?>
                                         <button type="submit" class="btn-course btn-secondary">
-                                            Archive
+                                            Delete
                                         </button>
                                     </form>
  

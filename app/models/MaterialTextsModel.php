@@ -20,4 +20,28 @@ class MaterialTextsModel extends Model {
             'content' => $data['content']
         ]);
     }
+
+    public function updateMaterialText(
+        string $materialId,
+        array $data
+    ): bool {
+        return $this->update(
+            'material_texts',
+            [
+                'content' => $data['content']
+            ],
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
+
+    public function deleteMaterialText(string $materialId): bool {
+        return $this->delete(
+            'material_texts',
+            [
+                'material_id' => $materialId
+            ]
+        );
+    }
 }

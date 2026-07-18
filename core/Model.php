@@ -95,8 +95,13 @@ class Model {
         return $this->run("INSERT INTO `$table` ($columns) VALUES ($placeholders)", $params);
     }
 
-    protected function update(string $table, array $data, string $where, array $whereParams = []): bool {
-        if (trim($where) === '') {
+    protected function update(
+        string $table,
+        array $data,
+        array $conditions,
+        string $operator = 'AND'
+    ): bool {
+        if (empty($conditions)) {
             throw new \InvalidArgumentException('Update tanpa kondisi WHERE tidak diperbolehkan.');
         }
 
@@ -108,19 +113,43 @@ class Model {
             $params[":set_$key"] = $value;
         }
 
+        [$where, $whereParams] = $this->buildWhere($conditions, $operator);
+
         $params = array_merge($params, $whereParams);
 
-        $sql = "UPDATE `$table` SET " . implode(', ', $set) . " WHERE $where";
+        $sql = "
+            UPDATE `$table`
+            SET " . implode(', ', $set) . "
+            WHERE $where
+        ";
 
         return $this->run($sql, $params);
     }
 
-    protected function delete(string $table, string $where, array $params = []): bool {
-        if (trim($where) === '') {
-            throw new \InvalidArgumentException('Delete tanpa kondisi WHERE tidak diperbolehkan.');
+    protected function delete(
+        string $table,
+        array $conditions,
+        string $operator = 'AND'
+    ): bool {
+
+        if (empty($conditions)) {
+            throw new \InvalidArgumentException(
+                'Delete tanpa kondisi WHERE tidak diperbolehkan.'
+            );
         }
 
-        return $this->run("DELETE FROM `$table` WHERE $where", $params);
+        [$where, $params] = $this->buildWhere(
+            $conditions,
+            $operator
+        );
+
+        $sql = "
+            DELETE
+            FROM `$table`
+            WHERE $where
+        ";
+
+        return $this->run($sql, $params);
     }
 
     protected function lastInsertId() {
